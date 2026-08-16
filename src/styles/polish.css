@@ -1,0 +1,79 @@
+/* ===== Boot sequence ===== */
+.boot {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  z-index: 1000;
+  animation: boot-fade-out var(--dur-slow) var(--ease) forwards;
+  animation-delay: calc(350ms * 4 + 350ms);
+}
+@keyframes boot-fade-out {
+  to { opacity: 0; visibility: hidden; }
+}
+
+.boot__brand {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  color: var(--accent);
+  margin-left: 0.4em;
+  animation: boot-pulse 1.4s var(--ease) infinite alternate;
+}
+@keyframes boot-pulse {
+  from { opacity: 0.6; }
+  to   { opacity: 1; }
+}
+
+.boot__lines {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin: 0;
+  background: none;
+}
+.boot__line {
+  display: block;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease);
+}
+.boot__line--in {
+  opacity: 1;
+  transform: translateY(0);
+}
+.boot__line:last-child.boot__line--in { color: var(--success); }
+
+/* ===== Restore session ===== */
+.restore {
+  width: min(440px, calc(100vw - 2 * var(--space-lg)));
+}
+.restore__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+.restore__icon {
+  font-size: 22px;
+  display: inline-flex;
+  width: 36px; height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent-soft-3);
+  color: var(--accent);
+}
+.restore__body {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 var(--space-lg);
+}
+.restore__body strong { color: var(--text-primary); font-weight: 600; }

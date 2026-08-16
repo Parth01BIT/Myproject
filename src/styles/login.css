@@ -1,0 +1,219 @@
+/* ===== Auth-gate splash (V2.4) =====
+ * Bare loading screen while the auth session resolves. No theme context yet.
+ */
+.app-splash {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.1em;
+}
+.app-splash::after {
+  content: '◐';
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  color: var(--accent);
+  font-size: 28px;
+  margin-left: var(--space-sm);
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Login (V2.4) — email OTP gate =====
+ * Full-viewport card on a dimmed backdrop. Mirrors the PARTH dark identity
+ * (deep blue-grey + warm amber accent) but is intentionally self-contained:
+ * this renders before the browser shell / theme toggle exists, so we don't
+ * depend on [data-theme] attributes from useTheme.
+ */
+.login {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg-primary);
+  padding: var(--space-lg);
+  z-index: 200;
+}
+
+.login__card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--modal-shadow);
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Brand row */
+.login__brand {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+.login__brand-mark {
+  font-size: 28px;
+  color: var(--accent);
+  line-height: 1;
+}
+.login__brand-name {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--text-primary);
+}
+
+/* Setup note + errors */
+.login__note,
+.login__error {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  font-family: var(--font-body);
+}
+.login__note {
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  color: var(--text-secondary);
+}
+.login__note code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--surface-deep);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+.login__error {
+  background: var(--danger-soft);
+  border-left: 3px solid var(--danger);
+  color: var(--danger);
+}
+
+/* Form */
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.login__label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+}
+.login__label strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.login__input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+}
+.login__input::placeholder {
+  color: var(--text-muted);
+}
+.login__input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.login__input--code {
+  text-align: center;
+  letter-spacing: 0.5em;
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+.login__submit {
+  margin-top: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+}
+.login__submit:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+.login__submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.login__back {
+  margin-top: var(--space-xs);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  padding: var(--space-xs);
+  align-self: center;
+}
+.login__back:hover:not(:disabled) {
+  color: var(--text-secondary);
+}
+
+.login__hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  margin-top: var(--space-xs);
+  text-align: center;
+}
+
+.login__foot {
+  margin-top: var(--space-sm);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-align: center;
+  font-family: var(--font-body);
+}
+
+/* Mobile tighten */
+@media (max-width: 480px) {
+  .login { padding: var(--space-md); }
+  .login__card { padding: var(--space-lg) var(--space-md) var(--space-md); }
+  /* iOS-safe bottom: full-bleed card needs to respect the home-indicator bar,
+     otherwise the submit button sits under it. */
+  .login__card { padding-bottom: calc(var(--space-md) + var(--safe-bottom)); }
+  /* Submit button — comfortable tap target. */
+  .login__submit {
+    min-height: var(--tap-min);
+    width: 100%;
+    padding: var(--space-md);
+    font-size: var(--text-base);
+  }
+  /* OTP code input — already generous at text-xl, but on a 320px screen with
+     letter-spacing 0.5em, a 6-digit code can overflow horizontally. Allow
+     horizontal scroll if needed. */
+  .login__input--code {
+    font-size: var(--text-lg);
+    letter-spacing: 0.3em;
+  }
+}

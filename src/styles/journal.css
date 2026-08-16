@@ -1,0 +1,160 @@
+/* ===== Journal ===== */
+.journal {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.journal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.journal__save-indicator {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  min-width: 70px;
+  text-align: right;
+  transition: opacity var(--dur-slow) var(--ease), color var(--dur-fast) var(--ease);
+}
+.journal__save-indicator[data-state='saving'] { color: var(--text-secondary); opacity: 1; }
+.journal__save-indicator[data-state='saved']  { color: var(--success); opacity: 1; }
+.journal__save-indicator[data-state='idle']    { opacity: 0; }
+
+/* Mood row */
+.journal__moodrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.journal__mood-label {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.journal__moods {
+  display: flex;
+  gap: var(--space-xs);
+}
+.mood {
+  width: 36px; height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border-radius: var(--radius-md);
+  opacity: 0.5;
+  filter: grayscale(0.4);
+  transition: transform var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease), filter var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.mood:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+  filter: grayscale(0);
+}
+.mood--active {
+  opacity: 1;
+  filter: grayscale(0);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 1px var(--accent-tint) inset;
+  transform: scale(1.05);
+}
+
+/* ===== Rich editor ===== */
+.richeditor {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.richeditor__toolbar {
+  display: flex;
+  gap: 2px;
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--border-faint);
+  background: var(--surface-deep);
+}
+.richeditor__btn {
+  width: 28px; height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.richeditor__btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.richeditor__surface {
+  min-height: 320px;
+  max-height: 60vh;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--text-base);
+  line-height: 1.65;
+  overflow-y: auto;
+  outline: none;
+}
+.richeditor__surface:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+  font-style: italic;
+}
+/* contentEditable formatting styles */
+.richeditor__surface h1 { font-size: 1.6em; margin: 0.6em 0 0.3em; font-weight: 700; line-height: 1.3; }
+.richeditor__surface h2 { font-size: 1.35em; margin: 0.5em 0 0.25em; font-weight: 700; line-height: 1.3; }
+.richeditor__surface h3 { font-size: 1.15em; margin: 0.4em 0 0.2em; font-weight: 600; line-height: 1.3; }
+.richeditor__surface ul { list-style: disc; padding-left: 1.5em; margin: 0.4em 0; }
+.richeditor__surface ol { list-style: decimal; padding-left: 1.5em; margin: 0.4em 0; }
+.richeditor__surface li { margin: 0.15em 0; }
+.richeditor__surface p  { margin: 0.3em 0; }
+
+/* Tags footer */
+.journal__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.journal__tags-label {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.journal__tags-input {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.journal__tags-input::placeholder { color: var(--text-muted); }
+
+/* Mobile/touch journal adjustments. */
+@media (max-width: 768px) {
+  /* Mood row collapses gracefully — wrap moods below the label on phones. */
+  .journal__moodrow { flex-wrap: wrap; gap: var(--space-sm); }
+  /* Tags row: on phones the label + input + chips can't fit one line cleanly.
+     Stack label above input. */
+  .journal__footer { flex-wrap: wrap; }
+  /* Rich-editor surface — 320px min-height is too tall on a 667px phone
+     (half the screen). Drop to 200px so the supporter chrome (toolbar +
+     tags footer) stay above the fold. */
+  .richeditor__surface { min-height: 200px; }
+  /* Toolbar gap 2px is too tight for thumb taps; give buttons breathing room. */
+  .richeditor__toolbar { gap: 4px; padding: var(--space-sm); }
+  .richeditor__btn { width: 32px; height: 32px; }
+  /* Mood chips grow to comfortable tap size. */
+  .mood { width: var(--tap-min); height: var(--tap-min); font-size: 22px; }
+}

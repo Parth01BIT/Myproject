@@ -1,0 +1,357 @@
+/* ============================================================
+   PARTH — Design Tokens
+   Dual-scope theming. Dark is the default identity of the app;
+   light ("warm paper + ink") is an alternate, deliberately
+   editorial — not a recolored dark theme.
+   ============================================================ */
+
+/* ===== Dark palette (default) ===== */
+:root,
+[data-theme='dark'] {
+  /* Backgrounds */
+  --bg-primary:    hsl(220, 15%, 8%);   /* deepest layer, page bg */
+  --bg-secondary: hsl(220, 14%, 12%);  /* content area */
+  --bg-tab:       hsl(220, 14%, 15%);
+  --bg-tab-active:hsl(220, 14%, 18%);
+  --surface:      hsl(220, 12%, 16%);  /* cards, inputs, wells */
+  --surface-deep: hsl(220, 14%, 10%);  /* darker surface for nested wells */
+  --surface-hover:hsl(220, 12%, 18%);
+
+  /* Text */
+  --text-primary:   hsl(220, 10%, 88%);
+  --text-secondary: hsl(220, 8%, 55%);
+  --text-muted:     hsl(220, 6%, 35%);
+
+  /* Accent + status */
+  --accent:     hsl(45, 90%, 60%);
+  --accent-dim: hsl(45, 50%, 30%);
+  --accent-hover:hsl(45, 90%, 68%);
+  --success:    hsl(145, 60%, 45%);
+  --success-dim:hsl(145, 50%, 25%);
+  --danger:     hsl(0, 65%, 55%);
+  --danger-soft:hsla(0, 65%, 55%, 0.12);
+
+  /* Tab indicator dots */
+  --dot-journal: hsl(210, 80%, 60%);
+  --dot-planner: hsl(40, 85%, 58%);
+  --dot-tracker: hsl(145, 55%, 52%);
+
+  /* Soft accents (alphas + tints, theme-aware) */
+  --accent-soft:  hsla(45, 60%, 30%, 0.18);
+  --accent-soft-2:hsla(45, 60%, 30%, 0.16);
+  --accent-soft-3:hsla(45, 60%, 30%, 0.20);
+  --accent-tint:  hsla(45, 90%, 60%, 0.35);
+  --planner-tint: hsla(40, 85%, 58%, 0.15);
+  --success-soft: hsla(145, 60%, 45%, 0.15);
+
+  /* Borders */
+  --border:        hsl(220, 12%, 22%);
+  --border-strong: hsl(220, 12%, 30%);
+  --border-faint:  hsl(220, 12%, 18%);
+  --chrome-border: hsl(220, 14%, 6%);
+  --titlebar-grad-1: hsl(220, 14%, 10%);
+  --titlebar-grad-2: hsl(220, 14%,  9%);
+
+  /* Shuttle / chrome tints */
+  --check-empty:  hsl(220, 8%, 45%);
+  --toggle-track: hsl(220, 12%, 22%);
+  --today-empty-border: hsl(220, 12%, 22%);
+
+  /* Shadow + overlay */
+  --shadow-md: 0 12px 64px rgba(0, 0, 0, 0.45);
+  --modal-backdrop: rgba(0, 0, 0, 0.55);
+  --modal-backdrop-blur: 2px;
+  --modal-shadow: var(--shadow-md);
+
+  /* Selection */
+  --selection-bg: var(--accent);
+  --selection-fg: var(--bg-primary);
+
+  /* Scrollbar */
+  --scrollbar-thumb:       hsl(220, 12%, 22%);
+  --scrollbar-thumb-hover: hsl(220, 12%, 28%);
+
+  /* Paper grain — disabled in dark mode for editorial cleanliness */
+  --grain-opacity: 0;
+
+  color-scheme: dark;
+}
+
+/* ===== Light palette — "warm paper + ink" =====
+   Reads like a printed book, not a light-mode screenshot.
+   - Warm off-white paper, not pure white.
+   - Cool ink counters the warm paper for editorial tension.
+   - Subtle SVG noise grain (~3% opacity) only in light mode.
+   - Tab chrome keeps an inverted darker band so the browser
+     metaphor survives the theme flip — chrome never goes paper-white.
+*/
+[data-theme='light'] {
+  /* Backgrounds */
+  --bg-primary:    hsl(40, 30%, 96%);   /* warm paper */
+  --bg-secondary:  hsl(40, 26%, 94%);   /* content area */
+  --bg-tab:        hsl(40, 22%, 92%);
+  --bg-tab-active: hsl(40, 28%, 90%);
+  --surface:       hsl(40, 24%, 92%);  /* cards, inputs */
+  --surface-deep:  hsl(40, 20%, 88%);
+  --surface-hover: hsl(40, 28%, 88%);
+
+  /* Text — ink */
+  --text-primary:   hsl(220, 22%, 14%);
+  --text-secondary: hsl(220, 14%, 38%);
+  --text-muted:     hsl(220, 10%, 60%);
+
+  /* Accent + status — retuned so they sing on paper, not neon */
+  --accent:     hsl(28, 80%, 42%);  /* earthy amber-burnt orange */
+  --accent-dim: hsl(28, 50%, 78%);
+  --accent-hover:hsl(28, 82%, 36%);
+  --success:    hsl(145, 48%, 32%);
+  --success-dim:hsl(145, 40%, 86%);
+  --danger:     hsl(8, 75%, 44%);
+  --danger-soft:hsla(8, 75%, 44%, 0.10);
+
+  /* Tab indicator dots (kept slightly less neon on paper) */
+  --dot-journal: hsl(210, 60%, 42%);
+  --dot-planner: hsl(35, 70%, 42%);
+  --dot-tracker: hsl(145, 45%, 36%);
+
+  /* Soft accents */
+  --accent-soft:   hsla(28, 70%, 42%, 0.10);
+  --accent-soft-2: hsla(28, 70%, 42%, 0.10);
+  --accent-soft-3: hsla(28, 70%, 42%, 0.12);
+  --accent-tint:   hsla(28, 70%, 42%, 0.45);
+  --planner-tint:  hsla(35, 70%, 50%, 0.14);
+  --success-soft:  hsla(145, 48%, 32%, 0.14);
+
+  /* Borders — hairline, cool to balance warm paper */
+  --border:        hsl(220, 14%, 86%);
+  --border-strong: hsl(220, 14%, 72%);
+  --border-faint:  hsl(220, 10%, 90%);
+  --chrome-border: hsl(220, 14%, 70%);
+  --titlebar-grad-1: hsl(40, 22%, 92%);
+  --titlebar-grad-2: hsl(40, 20%, 90%);
+
+  /* Shuttle / chrome tints */
+  --check-empty:  hsl(220, 14%, 62%);
+  --toggle-track: hsl(220, 14%, 78%);
+  --today-empty-border: hsl(220, 12%, 80%);
+
+  /* Shadow + overlay — paper shadows are warm, soft, low-contrast */
+  --shadow-md: 0 6px 24px hsla(40, 30%, 40%, 0.12);
+  --modal-backdrop: hsla(40, 25%, 30%, 0.35);
+  --modal-backdrop-blur: 2px;
+  --modal-shadow: 0 12px 48px hsla(40, 30%, 30%, 0.22);
+
+  /* Selection */
+  --selection-bg: var(--accent);
+  --selection-fg: hsl(40, 30%, 96%);
+
+  /* Scrollbar */
+  --scrollbar-thumb:       hsl(220, 10%, 80%);
+  --scrollbar-thumb-hover: hsl(220, 10%, 70%);
+
+  /* Paper grain — on in light mode */
+  --grain-opacity: 0.045;
+
+  color-scheme: light;
+}
+
+/* ============================================================
+   Static design tokens (theme-invariant)
+   ============================================================ */
+:root {
+  /* Typography */
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.25rem;
+  --text-xl:   1.5rem;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl:48px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-tab: 8px 8px 0 0;
+
+  /* Motion */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-base: 200ms;
+  --dur-slow: 300ms;
+
+  /* Layout */
+  --shell-max-width:    1400px;
+  --titlebar-height:    36px;
+  --tabbar-height:      40px;
+  --addressbar-height: 40px;
+
+  /* Mobile safe-area (notch / home-indicator). Falls back to 0 on desktop. */
+  --safe-top:    env(safe-area-inset-top,    0px);
+  --safe-right:  env(safe-area-inset-right,  0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left,   0px);
+
+  /* Minimum tap target (Apple HIG / Material). */
+  --tap-min: 44px;
+}
+
+/* ============================================================
+   Reset (theme-aware via variables)
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Allow overscroll to settle inside the app rather than the browser. */
+  overscroll-behavior: none;
+}
+
+/* iOS Safari zooms automatically when inputs < 16px are focused. Force 16px
+   on every form control so the viewport stays stable on mobile. Desktop is
+   unaffected (the surrounding `font: inherit` chain still sets the visible
+   size of badges/labels/etc — these rules only kick in below 768px). */
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Paper grain overlay — only active in light theme (--grain-opacity > 0). */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-fg);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* ============================================================
+   Touch / coarse-pointer adaptations
+   ------------------------------------------------------------
+   PARTH's desktop UI leans heavily on hover-revealed actions: tracker
+   card edit/delete, task ▶ focus-launch, task delete, drag handles.
+   Touch devices have no hover, so these would be unreachable.
+   `@media (hover: none)` matches coarse pointers (phones, tablets,
+   touch laptops) — we force-reveal the hidden actions there.
+   Desktop with a mouse keeps the elegant reveal-on-hover behavior.
+   ============================================================ */
+@media (hover: none) {
+  /* Tracker card edit/delete — V2.4 tracker.css `.trkcard__actions` is
+     opacity: 0 by default. Reveal at 0.6 (subtler than full 1 to keep
+     visual noise down) and shift them to a row tap target. */
+  .trkcard__actions { opacity: 0.6; }
+
+  /* Task-row hover-reveal actions — V2.4 planner.css. */
+  .task__focus,
+  .task__delete { opacity: 0.55; }
+
+  /* Drag handle brightening is impossible on touch, so make the handle
+     dim but visible. (Note: drag-reorder itself is not yet supported on
+     touch — that's a V2.5 follow-up; users can still long-press to edit
+     task text inline.) */
+  .task__handle { opacity: 0.5; }
+
+  /* Disable hover-only `transform: scale()` effects that look "stuck"
+     on touch devices after a tap. */
+  .cal__day:hover:not(:disabled) { transform: none; }
+  .mood:hover { transform: none; }
+  .tab--active::after { display: none; }
+}
+
+/* ============================================================
+   Short / landscape viewports (phones held sideways, small tablets)
+   ============================================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+  /* When the viewport is short (e.g. 667×375 iPhone landscape), the chrome
+     eats most of the screen. Recover space by hiding the address bar in
+     landscape too, even on tablets >768px wide. */
+  .addressbar { display: none; }
+}

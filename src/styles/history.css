@@ -1,0 +1,336 @@
+/* ===== History ===== */
+.history {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+}
+
+.cal {
+  background: var(--surface);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+}
+.cal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+.cal__monthlabel {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.cal__nav {
+  width: 32px; height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--surface-deep);
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.cal__nav:hover { background: var(--border); color: var(--text-primary); }
+
+.cal__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: var(--space-xs);
+}
+.cal__weekday {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: var(--space-xs) 0;
+}
+
+.cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.cal__day {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  background: var(--surface-deep);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.cal__day:hover:not(:disabled) {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  transform: scale(1.02);
+}
+.cal__day--out { opacity: 0.18; cursor: default; }
+.cal__day--today {
+  box-shadow: 0 0 0 1.5px var(--accent) inset;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Mobile/touch calendar adjustments. */
+@media (max-width: 768px) {
+  /* Tighten calendar padding on phones — history panel already has reduced
+     horizontal padding from the shell-level rule. */
+  .cal { padding: var(--space-sm); }
+  .cal__head { margin-bottom: var(--space-sm); }
+  .cal__monthlabel { font-size: var(--text-base); }
+  .cal__nav { width: var(--tap-min); height: var(--tap-min); }
+  /* Weekday abbreviations are 3 letters but they crowd on a 320px screen. */
+  .cal__weekday { font-size: 9px; letter-spacing: 0.04em; padding: 2px 0; }
+  /* Day cells: reduce inner padding so the day number + dots have more
+     visual room per cell. Cells already use `aspect-ratio: 1/1` so they
+     scale automatically with available width. */
+  .cal__day { font-size: 12px; padding: 2px; }
+  .cal__dots { gap: 2px; }
+  .dot { width: 5px; height: 5px; }
+  /* Legend — let it wrap and tighten gaps. */
+  .cal__legend { gap: var(--space-sm); }
+}
+
+.cal__daynum { font-variant-numeric: tabular-nums; }
+.cal__dots {
+  display: flex;
+  gap: 3px;
+  min-height: 6px;
+}
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  display: inline-block;
+}
+.dot--journal { background: var(--dot-journal); }
+.dot--planner { background: var(--dot-planner); }
+.dot--tracker { background: var(--dot-tracker); }
+.dot--focus { background: var(--accent); }
+
+.cal__legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+.cal__legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ===== Day detail ===== */
+.daydetail {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+.daydetail__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.daydetail__title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+.daydetail__back {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.daydetail__back:hover { color: var(--accent); background: var(--accent-soft-2); }
+
+.daydetail__empty {
+  padding: var(--space-2xl) var(--space-xl);
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+}
+
+.daydetail__section {
+  background: var(--surface);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+}
+.daydetail__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+.daydetail__heading h3 {
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--text-xs);
+}
+.daydetail__edit {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--accent);
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-sm);
+  transition: background var(--dur-fast) var(--ease);
+}
+.daydetail__edit:hover { background: var(--accent-soft-2); }
+
+.daydetail__journalmeta {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
+.daydetail__tags {
+  display: inline-flex;
+  gap: var(--space-xs);
+}
+.tag {
+  background: var(--border-faint);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+}
+.daydetail__journalcontent {
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--text-primary);
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: var(--space-xs);
+}
+.daydetail__journalcontent h1 { font-size: 1.4em; font-weight: 700; margin: 0.5em 0 0.25em; }
+.daydetail__journalcontent h2 { font-size: 1.2em; font-weight: 700; margin: 0.4em 0 0.2em; }
+.daydetail__journalcontent h3 { font-size: 1.05em; font-weight: 600; margin: 0.3em 0 0.15em; }
+.daydetail__journalcontent ul { list-style: disc; padding-left: 1.5em; margin: 0.3em 0; }
+.daydetail__journalcontent ol { list-style: decimal; padding-left: 1.5em; margin: 0.3em 0; }
+.daydetail__muted { color: var(--text-muted); font-style: italic; }
+
+.daydetail__tasks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.daydetail__task {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  font-size: var(--text-sm);
+}
+.daydetail__task--done .daydetail__tasktitle { text-decoration: line-through; color: var(--text-muted); opacity: 0.6; }
+.daydetail__check { font-family: var(--font-mono); color: var(--text-secondary); }
+.daydetail__tasktitle { flex: 1; color: var(--text-primary); }
+.daydetail__tasktime {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+.badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  text-transform: lowercase;
+}
+.badge--red   { color: var(--danger); background: var(--danger-soft); }
+.badge--amber { color: var(--dot-planner); background: var(--planner-tint); }
+
+.daydetail__trackerlogs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.daydetail__trackerlogs li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid var(--border-faint);
+  font-size: var(--text-sm);
+}
+.daydetail__trackerlogs li:last-child { border-bottom: none; }
+.daydetail__trackername { color: var(--text-primary); }
+.daydetail__trackerval { font-family: var(--font-mono); color: var(--text-secondary); }
+
+/* ===== Focus timeline (V2.3) ===== */
+.daydetail__focus-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+.daydetail__session {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--surface-deep);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+.daydetail__session-time { color: var(--text-muted); }
+.daydetail__session-task { color: var(--text-primary); }
+.daydetail__session-meta { display: inline-flex; align-items: center; gap: var(--space-xs); }
+.daydetail__session-mark {
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+}
+.daydetail__session-mark--complete { color: var(--success); background: var(--success-soft); }
+.daydetail__session-mark--manual   { color: var(--text-secondary); background: var(--border-faint); }
+.daydetail__session-mark--switched { color: var(--accent); background: var(--accent-soft-2); }
+.daydetail__session-empty {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: var(--text-sm);
+  padding: var(--space-sm) 0;
+}
+
+/* Mobile/touch day-detail adjustments. */
+@media (max-width: 768px) {
+  .daydetail__head { gap: var(--space-sm); }
+  .daydetail__title { font-size: var(--text-lg); }
+  /* Section cards lose a bit of horizontal padding on phones. */
+  .daydetail__section { padding: var(--space-sm) var(--space-md); }
+  /* Focus session grid — auto 1fr auto works but task title wraps poorly.
+     Allow the middle column to wrap and let meta wrap below. */
+  .daydetail__session {
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 'time  task' 'time  meta';
+    gap: 2px var(--space-sm);
+    align-items: start;
+  }
+  .daydetail__session-time { grid-area: time; align-self: center; }
+  .daydetail__session-task { grid-area: task; }
+  .daydetail__session-meta { grid-area: meta; }
+  /* Journal content max-height — too short on phones; let it flow. */
+  .daydetail__journalcontent { max-height: none; }
+}

@@ -1,0 +1,195 @@
+/* ===== Focus Widget (V2.3) =====
+ * PiP-style floating mini-widget, bottom-right of viewport.
+ * V2.3 ships fixed-position. Drag-to-reposition is parked to V3.
+ */
+.focuswidget {
+  position: fixed;
+  bottom: var(--space-lg);
+  right: var(--space-lg);
+  z-index: 90;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-md);
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--modal-shadow);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  opacity: 0.4;
+  transition: opacity var(--dur-base) var(--ease), transform var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+  user-select: none;
+  max-width: 320px;
+}
+.focuswidget--hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* Progress ring */
+.focuswidget__ring {
+  position: relative;
+  width: 56px; height: 56px;
+}
+.focuswidget__ring-track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 4;
+}
+.focuswidget__ring-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dasharray 200ms linear;
+}
+.focuswidget__ring-fill--break { stroke: var(--success); }
+.focuswidget__mode {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  color: var(--accent);
+  line-height: 1;
+}
+.focuswidget__ring-fill--break ~ .focuswidget__mode { color: var(--success); }
+
+/* Body */
+.focuswidget__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.focuswidget__meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+.focuswidget__mode-pill {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+.focuswidget__mode-pill--focus {
+  background: var(--accent-soft-2);
+  color: var(--accent);
+}
+.focuswidget__mode-pill--break {
+  background: var(--success-soft);
+  color: var(--success);
+}
+.focuswidget__status {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+.focuswidget__time {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+.focuswidget__task {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* Controls */
+.focuswidget__controls {
+  display: flex;
+  gap: var(--space-xs);
+}
+.fw-btn {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.fw-btn:hover {
+  background: var(--border);
+  color: var(--text-primary);
+}
+.fw-btn--danger:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* Tip */
+.focuswidget__tip {
+  position: absolute;
+  bottom: calc(100% + var(--space-sm));
+  right: 0;
+  width: 280px;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--modal-shadow);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  pointer-events: none;
+  animation: tip-in var(--dur-fast) var(--ease);
+}
+/* On phones the 280px tip would overflow the left edge of the full-width
+   widget. Let it span the widget's effective width instead. */
+@media (max-width: 768px) {
+  .focuswidget__tip { width: 100%; }
+}
+@keyframes tip-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile: widget spans the full width minus margins. */
+@media (max-width: 480px) {
+  .focuswidget {
+    bottom: var(--space-sm);
+    right: var(--space-sm);
+    left: var(--space-sm);
+    max-width: none;
+  }
+}
+
+/* Tablet-and-below: full-width widget with safe-area-aware margins. The
+   existing 480px rule above does the structural work; this extends the
+   breakpoint to 768px so phones in landscape + small tablets also get the
+   widget pinned full-width rather than floating in the bottom-right corner
+   (which is hard to reach with a thumb on a 7" tablet). */
+@media (max-width: 768px) {
+  .focuswidget {
+    bottom: calc(var(--space-sm) + var(--safe-bottom));
+    right: var(--space-sm);
+    left: var(--space-sm);
+    max-width: none;
+    /* Slightly elevated opacity on touch — hover-to-reveal is meaningless. */
+    opacity: 0.85;
+  }
+  /* Bigger controls for thumb accuracy. */
+  .fw-btn { width: var(--tap-min); height: var(--tap-min); font-size: 14px; }
+  /* Slightly larger ring so the time text inside it is readable. */
+  .focuswidget__ring { width: 64px; height: 64px; }
+  /* Task title — give it more room to truncate meaningfully. */
+  .focuswidget__task { max-width: none; }
+}

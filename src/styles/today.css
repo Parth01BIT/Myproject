@@ -1,0 +1,226 @@
+/* ===== Today ===== */
+.today {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+.today__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.today__title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+.today__date {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.today__empty-top {
+  width: 100%;
+  text-align: center;
+  padding: var(--space-md);
+  color: var(--text-muted);
+  font-style: italic;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+}
+
+.today__streaks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+.today__streak-chip {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-tint);
+  border-radius: 999px;
+  color: var(--accent);
+}
+.today__streak-chip strong { font-weight: 600; }
+
+/* Focus mini-stat (V2.3) — same chip shape, slightly distinct tint via accent. */
+.today__focus-chip {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--accent-soft-2);
+  border: 1px solid var(--accent-tint);
+  border-radius: 999px;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.today__focus-chip--live::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: focus-pulse 1.4s var(--ease) infinite;
+}
+@keyframes focus-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.8); }
+}
+
+.today__section {
+  background: var(--surface);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+}
+.today__section-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+.today__section-title {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  font-weight: 600;
+  flex: 1;
+}
+.today__section-meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+.today__open {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--accent);
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-sm);
+  transition: background var(--dur-fast) var(--ease);
+}
+.today__open:hover { background: var(--accent-soft-2); }
+
+/* Tasks */
+.today__tasks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.today__task {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  font-size: var(--text-sm);
+}
+.today__task--done .today__task-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  opacity: 0.55;
+}
+.today__check {
+  width: 16px; height: 16px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--check-empty);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: transparent;
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.today__task--done .today__check { background: var(--accent); border-color: var(--accent); }
+.today__check-icon { color: var(--bg-primary); font-size: 10px; font-weight: 700; }
+.today__task-title {
+  flex: 1;
+  color: var(--text-primary);
+}
+.today__task-time {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+.priority-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Trackers */
+.today__trackers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.today__tracker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  font-size: var(--text-sm);
+}
+.today__tracker-name { flex: 1; color: var(--text-primary); }
+.today__tracker-unit { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); margin-left: 2px; }
+.today__tracker-status {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+.today__tracker-status--logged { color: var(--success); }
+
+.toggle--sm { width: 32px; height: 20px; border-radius: 10px; }
+.toggle--sm .toggle__dot { width: 16px; height: 16px; top: 2px; }
+.toggle--sm.toggle--on .toggle__dot { transform: translateX(12px); }
+
+.numinput--sm { width: 56px; padding: 2px var(--space-sm); }
+
+/* Journal preview */
+.today__journal-snip {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  line-height: 1.5;
+  padding: var(--space-xs) 0;
+  cursor: default;
+  opacity: 0.85;
+}
+.today__journal-tags {
+  display: inline-flex;
+  gap: var(--space-xs);
+  font-size: var(--text-xs);
+}
+.today__journal-empty {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: var(--text-sm);
+}
+.mood-emoji {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Mobile/touch today adjustments. */
+@media (max-width: 768px) {
+  /* Headers already `flex-wrap: wrap` — reduce gap, since space is tight. */
+  .today__head { gap: var(--space-xs); }
+  .today__title { font-size: var(--text-lg); }
+  /* Section cards can lose 8px of horizontal padding on phones. */
+  .today__section { padding: var(--space-sm) var(--space-md); }
+  /* Task row spacing — breathe a bit more for tap accuracy. */
+  .today__task { padding: var(--space-sm) 0; }
+  .today__check { width: 20px; height: 20px; }
+  /* Tracker minitoggle — already `.toggle--sm`, but ensure the dot scales
+     enough to be tappable. */
+  .toggle--sm { width: 44px; height: 26px; border-radius: 13px; }
+  .toggle--sm .toggle__dot { width: 20px; height: 20px; top: 3px; }
+  .toggle--sm.toggle--on .toggle__dot { transform: translateX(18px); }
+}

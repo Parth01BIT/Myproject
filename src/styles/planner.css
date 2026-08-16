@@ -1,0 +1,208 @@
+/* ===== Planner ===== */
+.planner {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+}
+
+.planner__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+.planner__count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.planner__quickadd {
+  margin-bottom: var(--space-md);
+}
+.planner__quickadd-input {
+  width: 100%;
+  padding: var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+}
+.planner__quickadd-input::placeholder { color: var(--text-muted); }
+.planner__quickadd-input:focus { border-color: var(--accent-dim); }
+
+.planner__empty {
+  padding: var(--space-2xl) var(--space-xl);
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.planner__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+/* ===== Task item ===== */
+.task {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-md);
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+}
+.task:hover { background: var(--surface-hover); }
+.task--high { border-left: 3px solid var(--danger); padding-left: calc(var(--space-md) - 2px); }
+.task--focusing {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-tint) inset;
+}
+
+.task__handle {
+  color: var(--text-muted);
+  font-size: 12px;
+  height: 28px; width: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+  letter-spacing: -2px;
+  opacity: 0.4;
+}
+.task__handle:hover { opacity: 1; color: var(--text-secondary); }
+.task__handle:active { cursor: grabbing; }
+
+.task__check {
+  width: 18px; height: 18px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--check-empty);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  flex-shrink: 0;
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.task__check:hover { border-color: var(--accent); }
+.task--done .task__check { background: var(--accent); border-color: var(--accent); }
+.task__check-icon { color: var(--bg-primary); font-size: 11px; font-weight: 700; line-height: 1; }
+
+.task__priority {
+  width: 24px; height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.task__priority-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 3px transparent;
+  transition: box-shadow var(--dur-fast) var(--ease);
+}
+.task__priority:hover .task__priority-dot { box-shadow: 0 0 0 3px var(--border); }
+
+/* Focus-Timer launch button (V2.3) — same hover-reveal pattern as .task__delete. */
+.task__focus {
+  width: 24px; height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.task:hover .task__focus { opacity: 1; }
+.task__focus:hover { color: var(--accent); background: var(--accent-soft-3); }
+.task--focusing .task__focus {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.task__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+}
+.task__title {
+  flex: 1;
+  color: var(--text-primary);
+  cursor: text;
+  /* Strikethrough animation (PRD §8.5) */
+  position: relative;
+  overflow: hidden;
+  background-image: linear-gradient(var(--text-muted), var(--text-muted));
+  background-position: 0 60%;
+  background-size: 0% 1px;
+  background-repeat: no-repeat;
+  transition: background-size var(--dur-base) var(--ease), color var(--dur-base) var(--ease), opacity var(--dur-base) var(--ease);
+}
+.task__title:hover { text-decoration: underline; text-decoration-color: var(--text-muted); }
+.task--done .task__title {
+  background-size: 100% 1px;
+  color: var(--text-muted);
+  opacity: 0.55;
+}
+
+.task__title-input, .task__time-input {
+  flex: 1;
+  font: inherit;
+  background: var(--surface-hover);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-sm);
+  color: var(--text-primary);
+}
+.task__time-input { max-width: 120px; }
+
+.task__time {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  padding: 2px var(--space-xs);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+.task__time:hover { color: var(--accent); background: var(--accent-soft-3); }
+
+.task__delete {
+  width: 24px; height: 24px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.task:hover .task__delete { opacity: 1; }
+.task__delete:hover { color: var(--danger); background: var(--danger-soft); }
+
+/* Mobile/touch planner adjustments. */
+@media (max-width: 768px) {
+  .planner__head { gap: var(--space-sm); flex-wrap: wrap; }
+  /* Quickadd input: bump padding so the 16px font-size + comfortable tall tap
+     target coexist. The input already has 100% width; pad its height. */
+  .planner__quickadd-input { padding: var(--space-sm) var(--space-md); }
+  /* Tighten the task body gaps so a one-line title doesn't wrap into two
+     lines on a 360px-wide card with a priority dot + 24px action buttons
+     eating space on either side. */
+  .task { padding: var(--space-sm); gap: var(--space-xs); }
+  .task__body { gap: var(--space-sm); flex-wrap: wrap; }
+  /* Time input was max-width 120px — fine on phone, just remove the cap so it
+     shrinks naturally and doesn't push the title off the row. */
+  .task__time-input { max-width: 96px; }
+  /* Drag handle is non-functional on touch — collapse it so the row reclaims
+     ~16px of horizontal room. (Drag-reorder on touch is V2.5.) */
+  .task__handle { display: none; }
+}

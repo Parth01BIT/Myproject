@@ -1,0 +1,239 @@
+/* ===== Clock tab (V2.2) ===== */
+.clock {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* Segmented control */
+.clock__segmented {
+  display: inline-flex;
+  background: var(--surface-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  align-self: center;
+}
+.clock__seg {
+  padding: var(--space-xs) var(--space-lg);
+  border-radius: calc(var(--radius-md) - 2px);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.clock__seg:hover { color: var(--text-primary); }
+.clock__seg--active {
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* Pane */
+.clock__pane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+  position: relative;
+}
+
+/* Display */
+.clock__display {
+  font-family: var(--font-mono);
+  font-size: clamp(3rem, 10vw, 5.5rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  text-align: center;
+  padding: var(--space-lg) 0 var(--space-sm);
+  line-height: 1;
+}
+.clock__display--timer {
+  font-size: clamp(4rem, 14vw, 7rem);
+}
+.clock__display--done {
+  color: var(--success);
+  animation: clock-done-pulse 0.7s var(--ease) 3 alternate;
+}
+@keyframes clock-done-pulse {
+  from { transform: scale(1);    opacity: 0.9; }
+  to   { transform: scale(1.04); opacity: 1; }
+}
+
+/* Controls */
+.clock__controls {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+.clock__controls .btn { min-width: 88px; justify-content: center; }
+
+/* Laps */
+.clock__laps {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+.clock__laps li {
+  display: grid;
+  grid-template-columns: 48px 1fr 1fr;
+  gap: var(--space-md);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.clock__lap-idx {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+.clock__lap-delta { color: var(--text-primary); }
+.clock__lap-total { color: var(--text-secondary); text-align: right; }
+
+/* Timer presets (chips) */
+.clock__presets {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.chip {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.chip:hover:not(:disabled) {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+.chip--active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.chip:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Custom time inputs */
+.clock__custom {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.clock__custom-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.clock__custom-field input {
+  width: 64px;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.clock__custom-field input:focus { border-color: var(--accent); }
+.clock__custom-field input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Done overlay */
+.clock__done-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-backdrop);
+  backdrop-filter: blur(var(--modal-backdrop-blur));
+  display: grid;
+  place-items: center;
+  z-index: 200;
+  animation: fade-in var(--dur-fast) var(--ease);
+}
+.clock__done-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--modal-shadow);
+  padding: var(--space-xl) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  text-align: center;
+}
+.clock__done-icon {
+  font-size: 48px;
+  line-height: 1;
+  animation: clock-done-pulse 0.7s var(--ease) infinite alternate;
+}
+.clock__done-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.clock__done-sub {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Mobile/touch clock adjustments. */
+@media (max-width: 768px) {
+  /* Segmented control is fine — `inline-flex` shrinks to fit. Just bump tap. */
+  .clock__seg { padding: var(--space-sm) var(--space-md); }
+  /* Display already uses clamp(3rem, 10vw, 5.5rem) and clamp(4rem, 14vw, 7rem)
+     so it scales naturally. No override needed. */
+  /* Controls: ensure the Start/Stop/Lap buttons hit 44px tap height. */
+  .clock__controls { gap: var(--space-sm); flex-wrap: wrap; justify-content: center; }
+  .clock__controls .btn { min-height: var(--tap-min); min-width: var(--tap-min); padding: var(--space-sm) var(--space-lg); }
+  /* Lap rows — grid is 48px 1fr 1fr, fine; just reduce font slightly. */
+  .clock__laps li { padding: var(--space-xs) var(--space-sm); }
+  /* Custom time inputs are 3 × 64px + labels = ~220px min. On a 320px phone
+     this fits, but at ≤320 we shrink width to 56px and the labels stack. */
+  .clock__custom { gap: var(--space-sm); }
+  .clock__custom-field input { width: 56px; }
+  /* Presets — already flex-wrap and centered. Make each chip taller. */
+  .chip { padding: var(--space-sm) var(--space-md); }
+  /* Done-overlay card — on phones the card can fill most of the screen. */
+  .clock__done-card { padding: var(--space-lg) var(--space-md); margin: var(--space-md); }
+  .clock__done-icon { font-size: 36px; }
+}
+
+@media (max-width: 380px) {
+  /* Extremely narrow phones — shrink laps row to 40px label col and let the
+     two numeric columns share remaining space. */
+  .clock__laps li { grid-template-columns: 40px 1fr 1fr; gap: var(--space-sm); }
+  /* Custom-time inputs — shrink further so all three fit on one row. */
+  .clock__custom-field input { width: 48px; }
+}

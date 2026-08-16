@@ -1,0 +1,310 @@
+/* ===== Tracker ===== */
+.tracker {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+}
+.tracker__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+.tracker__title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.tracker__empty {
+  padding: var(--space-2xl) var(--space-xl);
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+}
+.tracker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-md);
+}
+
+/* Mobile: stack tracker cards full-width. */
+@media (max-width: 768px) {
+  .tracker__grid { grid-template-columns: 1fr; gap: var(--space-sm); }
+  .tracker__head { margin-bottom: var(--space-md); }
+  /* Cards need a bit more internal room on touch — slightly larger paddings
+     give the toggle / numinput + log button air to breathe at thumb scale. */
+  .trkcard { padding: var(--space-md); gap: var(--space-sm); }
+  /* Make the boolean toggle a hair larger for thumb accuracy. */
+  .toggle { width: 52px; height: 32px; border-radius: 16px; }
+  .toggle .toggle__dot { width: 26px; height: 26px; top: 3px; left: 3px; }
+  .toggle--on .toggle__dot { transform: translateX(20px); }
+  /* Numeric input — was 70px wide, too tight at touch scale. */
+  .numinput { width: 80px; }
+}
+
+/* Mobile tracker modal — already uses `width: min(420px, calc(100vw - 2*var(--space-lg)))`
+   but on a 360px phone that resolves to 360-48=312px, leaving only 24px margins.
+   Pin to 100% width with safe-area-aware padding instead. */
+@media (max-width: 480px) {
+  .modal {
+    width: 100vw;
+    max-width: 100vw;
+    margin: 0;
+    border-radius: 0;
+    min-height: 100dvh;
+    padding: var(--space-lg) var(--space-md) calc(var(--space-lg) + var(--safe-bottom));
+  }
+  .modal-backdrop { align-items: stretch; }
+}
+
+/* ===== Card ===== */
+.trkcard {
+  background: var(--surface);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.trkcard--logged {
+  border-color: var(--success-dim);
+}
+.trkcard__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+.trkcard__name {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.trkcard__actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.trkcard:hover .trkcard__actions { opacity: 1; }
+
+.icon-btn {
+  width: 24px; height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 14px;
+  transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.icon-btn:hover { color: var(--text-primary); background: var(--border); }
+.icon-btn--danger:hover { color: var(--danger); background: var(--danger-soft); }
+
+/* Logging row */
+.trkcard__log {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* Boolean toggle */
+.toggle {
+  width: 44px; height: 28px;
+  border-radius: 14px;
+  background: var(--toggle-track);
+  position: relative;
+  flex-shrink: 0;
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.toggle--on { background: var(--success); }
+.toggle__dot {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 22px; height: 22px;
+  background: var(--text-primary);
+  border-radius: 50%;
+  transition: transform var(--dur-base) var(--ease), background var(--dur-base) var(--ease);
+}
+.toggle--on .toggle__dot { transform: translateX(16px); background: var(--bg-primary); }
+.toggle--bump { animation: trk-bump 160ms var(--ease); }
+@keyframes trk-bump {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Streak */
+.streak {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+.streak--active { color: var(--accent); }
+.streak__freeze { color: var(--text-muted); }
+
+/* Numeric input */
+.numinput {
+  width: 70px;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--surface-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.numinput:focus { border-color: var(--accent); }
+.trkcard__unit {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ===== Heatmap ===== */
+.heatmap {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  padding: 2px 0;
+}
+.heatmap__col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.heatmap__cell {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border-faint);
+}
+.heatmap__cell:empty,
+.heatmap__cell[style*='transparent'] {
+  border-color: transparent;
+  background: transparent;
+}
+
+/* ===== Buttons + Modal (shared primitives) ===== */
+.btn {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  border: 1px solid transparent;
+}
+.btn--primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+.btn--primary:hover { background: var(--accent-hover); }
+.btn--primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+.btn--ghost:hover { color: var(--text-primary); border-color: var(--border-strong); }
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-backdrop);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  backdrop-filter: blur(var(--modal-backdrop-blur));
+}
+.modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: min(420px, calc(100vw - 2 * var(--space-lg)));
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  box-shadow: var(--modal-shadow);
+}
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal__title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+.modal__close {
+  width: 28px; height: 28px;
+  color: var(--text-muted);
+  font-size: 20px;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.modal__close:hover { color: var(--text-primary); background: var(--surface-hover); }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.field__label {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+.field__input {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.field__input:focus { border-color: var(--accent); }
+
+.radios {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+/* Stack radio buttons on phones so the type-name + description aren't truncated. */
+@media (max-width: 480px) {
+  .radios { grid-template-columns: 1fr; }
+}
+.radios__opt {
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--text-secondary);
+  transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.radios__opt em { font-style: normal; font-size: var(--text-xs); color: var(--text-muted); }
+.radios__opt--active {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--accent-soft-2);
+}
+.radios__opt--active em { color: var(--text-secondary); }
+
+.modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}

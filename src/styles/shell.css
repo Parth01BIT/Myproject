@@ -1,0 +1,303 @@
+/* ===== Shell layout ===== */
+.shell {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  max-width: var(--shell-max-width);
+  margin: 0 auto;
+}
+
+/* Title bar — decorative chrome on the top strip. */
+.shell__titlebar {
+  height: var(--titlebar-height);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md);
+  background: linear-gradient(to bottom, var(--titlebar-grad-1), var(--titlebar-grad-2));
+  border-bottom: 1px solid var(--chrome-border);
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.shell__brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.shell__spacer {
+  flex: 1;
+}
+
+/* Theme toggle button — reuses .icon-btn styling, anchored right of chrome. */
+.theme-toggle {
+  height: 22px;
+  width: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--text-secondary);
+  -webkit-app-region: no-drag;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+  z-index: 2;
+}
+.theme-toggle:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+.theme-toggle:active { transform: scale(0.92); }
+
+/* Window control dots. */
+.window-controls {
+  display: flex;
+  gap: var(--space-xs);
+}
+.wc {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 0.5px solid rgba(0, 0, 0, 0.18);
+}
+.wc--close { background: #ff5f57; }
+.wc--min   { background: #febc2e; }
+.wc--max   { background: #28c840; }
+
+/* ===== Tab bar ===== */
+.tabbar {
+  height: var(--tabbar-height);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 var(--space-sm);
+  background: var(--bg-primary);
+  flex-shrink: 0;
+  gap: 2px;
+}
+
+.tab {
+  --tab-bg: var(--bg-tab);
+  height: 32px;
+  padding: 0 var(--space-md);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  border-radius: var(--radius-tab);
+  background: var(--tab-bg);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  position: relative;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+  border: 1px solid transparent;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.tab--active {
+  background: var(--bg-tab-active);
+  color: var(--text-primary);
+  /* Visual join: active tab's bottom edge merges with content area below. */
+  box-shadow:
+    0 -1px 0 var(--border) inset,
+    0 1px 0 var(--bg-secondary);
+  z-index: 2;
+}
+.tab--active::after {
+  /* Pixel-perfect corner nubs (anti-aliasing mask trick). */
+  content: '';
+  position: absolute;
+  left: -1px; right: -1px; bottom: 0;
+  height: 1px;
+  background: var(--bg-tab-active);
+}
+
+.tab--stale {
+  opacity: 0.55;
+  filter: saturate(0.6);
+}
+
+/* "tab playing audio"-style pulse for in-flight focus sessions (V2.3). */
+.tab--playing .tab__dot {
+  animation: tab-playing-pulse 1.4s var(--ease) infinite;
+}
+@keyframes tab-playing-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-tint); opacity: 1; }
+  50%      { box-shadow: 0 0 0 5px transparent;     opacity: 0.55; }
+}
+
+.tab__icon {
+  font-size: 0.95em;
+  line-height: 1;
+}
+.tab__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 2px;
+}
+
+/* ===== Address bar ===== */
+.addressbar {
+  height: var(--addressbar-height);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0 var(--space-sm) 0;
+  padding: 0 var(--space-md);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  user-select: none;
+}
+
+.addressbar__lock {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+.addressbar__url {
+  letter-spacing: 0.02em;
+}
+
+/* ===== Content area ===== */
+.shell__content {
+  flex: 1;
+  background: var(--bg-secondary);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Responsive: collapse tab labels to emoji-only below 768px (NF-009). */
+@media (max-width: 768px) {
+  .tab__label { display: none; }
+  .tab { padding: 0 var(--space-sm); }
+
+  /* Mobile chrome tweaks — free up vertical real estate and respect the notch. */
+  .shell {
+    /* Use safe-area insets so content doesn't tuck under the iPhone notch,
+       Dynamic Island, or the rounded display corners. */
+    padding-top: var(--safe-top);
+  }
+  .shell__titlebar {
+    height: calc(var(--titlebar-height) - 4px);
+    padding-left: max(var(--space-md), var(--safe-left));
+    padding-right: max(var(--space-md), var(--safe-right));
+  }
+  .shell__brand { display: none; }
+  /* Address bar is decorative browser chrome — wasteful on phones. Hide it. */
+  .addressbar { display: none; }
+  /* The active-tab ::after nub sits over a 1px gap that the address bar used
+     to mask. Hide it for mobile (it would otherwise draw a hairline across
+     the top of the content area). */
+  .tab--active::after { display: none; }
+
+  .tabbar {
+    padding-left: var(--space-xs);
+    padding-right: var(--space-xs);
+    /* Re-pad to safe-left/right for notch devices when the tabbar touches the
+       screen edges (no address bar means full-width tabs). */
+    padding-left: max(var(--space-xs), var(--safe-left));
+    padding-right: max(var(--space-xs), var(--safe-right));
+  }
+  .tab {
+    height: 36px;
+    flex: 1 1 0;
+    min-width: var(--tap-min);
+    justify-content: center;
+    padding: 0;
+  }
+  .tab__dot { margin-left: 3px; }
+}
+
+/* Very small phones (iPhone SE / Android budget) — tighten paddings. */
+@media (max-width: 480px) {
+  .shell__titlebar { height: 32px; padding: 0 var(--space-sm); }
+  .tabbar { height: 36px; }
+}
+
+/* Mobile content panels — every tab wrapper uses generous desktop padding
+   (space-xl = 32px). On phones, 32px on each side of a 360px screen = 64px
+   or ~18% lost to gutters. Shrink to space-md and let the inner cards breathe. */
+@media (max-width: 768px) {
+  /* Match every top-level tab container (.today, .journal, .planner, .tracker,
+     .clock, .daydetail, .history). These all share the desktop formula
+     `padding: var(--space-xl) var(--space-xl) var(--space-2xl)`. */
+  .shell__content > .today,
+  .shell__content > .journal,
+  .shell__content > .planner,
+  .shell__content > .tracker,
+  .shell__content > .clock,
+  .shell__content > .daydetail,
+  .shell__content > .history {
+    padding: var(--space-md) var(--space-md) calc(var(--space-2xl) + var(--safe-bottom));
+    /* Allow horizontal max-widths to relax — they already center via
+       margin: 0 auto, but the 760–1100px caps are moot below 768px. */
+    max-width: 100%;
+  }
+}
+
+/* ===== Day navigator (shared, used by Journal/Planner/History) ===== */
+.daynav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.daynav__btn {
+  width: 28px; height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+  line-height: 1;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.daynav__btn:hover:not(:disabled) {
+  background: var(--border);
+  color: var(--text-primary);
+}
+.daynav__btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.daynav__label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  min-width: 180px;
+  text-align: center;
+}
+
+/* Mobile: free up the daynav so Journal/Planner/History heads don't wrap. */
+@media (max-width: 768px) {
+  /* Allow the label to fit the available space rather than forcing 180px. */
+  .daynav { gap: var(--space-sm); flex-wrap: wrap; }
+  .daynav__label { min-width: 0; flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* Bump taps to Apple HIG min — small back/forward arrows are easy to miss
+     on touch. */
+  .daynav__btn { width: var(--tap-min); height: var(--tap-min); }
