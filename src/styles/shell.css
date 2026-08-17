@@ -301,3 +301,4 @@
   /* Bump taps to Apple HIG min — small back/forward arrows are easy to miss
      on touch. */
   .daynav__btn { width: var(--tap-min); height: var(--tap-min); }
+}
