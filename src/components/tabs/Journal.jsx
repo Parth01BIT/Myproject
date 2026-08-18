@@ -13,9 +13,6 @@ const MOODS = [
   { id: 'tired',     emoji: '😴', label: 'tired' },
 ];
 
-const MOOD_BY_ID = Object.fromEntries(MOODS.map((m) => [m.id, m]));
-void MOOD_BY_ID;
-
 /**
  * Journal tab — single entry per day (PRD §6.3).
  * One editor per active day; switching date loads that day's entry.

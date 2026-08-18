@@ -13,7 +13,6 @@ import { buildAddress } from '../../hooks/useRoute.js';
  */
 export default function BrowserShell({
   route,
-  setRoute,
   stale,
   onSelectTab,
   theme,

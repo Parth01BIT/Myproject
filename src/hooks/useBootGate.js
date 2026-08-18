@@ -17,6 +17,10 @@ const SESSION_KEY = 'parth:booted-this-tab';
 const HEARTBEAT_INTERVAL_MS = 4000;
 const HEARTBEAT_FRESH_WINDOW_MS = 8000;
 
+// Module-level guard: only one heartbeat interval per page lifetime.
+// Prevents duplicate intervals on hot-reload / React StrictMode double-mount.
+let _heartbeatId = null;
+
 export function useBootGate({ bootDurationMs = 2000 }) {
   const [shouldBoot, setShouldBoot] = useState(null); // null = pending, true = run, false = skip
 
@@ -79,9 +83,11 @@ export function useBootGate({ bootDurationMs = 2000 }) {
   function markBootedAndStartHeartbeat() {
     try { sessionStorage.setItem(SESSION_KEY, '1'); } catch {}
     try { localStorage.setItem(HEARTBEAT_KEY, String(Date.now())); } catch {}
-    setInterval(() => {
-      try { localStorage.setItem(HEARTBEAT_KEY, String(Date.now())); } catch {}
-    }, HEARTBEAT_INTERVAL_MS);
+    if (!_heartbeatId) {
+      _heartbeatId = setInterval(() => {
+        try { localStorage.setItem(HEARTBEAT_KEY, String(Date.now())); } catch {}
+      }, HEARTBEAT_INTERVAL_MS);
+    }
   }
 
   // Called by parent when the boot animation finishes.

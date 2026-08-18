@@ -12,7 +12,7 @@ export function useDebounced(fn, delay) {
   const debounced = useCallback((...args) => {
     clearTimeout(timer.current);
     timer.current = setTimeout(() => fnRef.current(...args), delay);
-  }, []);
+  }, [delay]);
   useEffect(() => () => clearTimeout(timer.current), []);
   return debounced;
 }

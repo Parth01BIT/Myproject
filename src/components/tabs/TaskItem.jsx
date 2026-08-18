@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useFocusTimer } from '../../contexts/FocusTimer.jsx';
+import { useFocusTimer } from '../../hooks/useFocusTimer.js';
 
 const PRIORITY_META = {
   low:    { label: '',     color: 'transparent', chip: null },
@@ -114,7 +114,11 @@ export default function TaskItem({ task, onChange, onDelete }) {
           e.stopPropagation();
           if (focusing) {
             // Pause if running, resume if paused.
-            focus.status === 'paused' ? focus.resume() : focus.pause();
+            if (focus.status === 'paused') {
+              focus.resume();
+            } else {
+              focus.pause();
+            }
           } else {
             focus.start(task);
           }

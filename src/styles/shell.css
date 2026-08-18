@@ -215,10 +215,7 @@
   .tab--active::after { display: none; }
 
   .tabbar {
-    padding-left: var(--space-xs);
-    padding-right: var(--space-xs);
-    /* Re-pad to safe-left/right for notch devices when the tabbar touches the
-       screen edges (no address bar means full-width tabs). */
+    /* Respect notch / safe-area on edge-to-edge phones. */
     padding-left: max(var(--space-xs), var(--safe-left));
     padding-right: max(var(--space-xs), var(--safe-right));
   }

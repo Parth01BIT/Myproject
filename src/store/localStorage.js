@@ -224,15 +224,10 @@ const focus = {
     // Sum actual focus elapsed across all 'focus' mode sessions on this date.
     const day = focus.get(date);
     let sec = 0;
-    let count = 0;
-    let liveSec = 0;
     for (const s of day.sessions || []) {
       if (s.mode !== 'focus') continue;
       sec += s.elapsedSec || 0;
-      count += s.completed ? 1 : 0;
-      if (s.stopReason === 'manual' || s.stopReason === 'switched') count += 1;
     }
-    void liveSec;
     return { seconds: sec, count: day.sessions.filter((s) => s.mode === 'focus').length };
   },
 };

@@ -104,7 +104,7 @@ export default function DayDetail({ dateKey, onBack, onEditIn }) {
             className="daydetail__journalcontent"
             dangerouslySetInnerHTML={{ __html: j.content || '' }}
           />
-          {!j.content && plain(j.content) === '' && (
+          {!j.content && (
             <div className="daydetail__muted">No text, only metadata.</div>
           )}
         </section>

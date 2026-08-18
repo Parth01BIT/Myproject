@@ -34,8 +34,19 @@ export function AuthProvider({ children }) {
   const [busy, setBusy]         = useState(false);
 
   // Initial session read + subscription to auth changes.
+  // Safety net: if getSession() never resolves within 4s (SDK hung, blocked
+  // by a browser extension, network blackhole, etc.), force loading=false
+  // so the user sees Login instead of a perpetual splash.
   useEffect(() => {
     let active = true;
+    let settled = false;
+
+    const release = () => {
+      if (!settled && active) {
+        settled = true;
+        setLoading(false);
+      }
+    };
 
     (async () => {
       try {
@@ -45,11 +56,12 @@ export function AuthProvider({ children }) {
       } catch (e) {
         console.warn('[PARTH] getSession failed:', e?.message);
       } finally {
-        if (active) setLoading(false);
+        release();
       }
     })();
 
     const { data: sub } = sb.auth.onAuthStateChange(async (_evt, session) => {
+      if (!active) return;
       if (session?.user) {
         setUser(sn(session.user));
         await maybeMigrate(session.user);
@@ -57,8 +69,11 @@ export function AuthProvider({ children }) {
         setUser(null);
       }
     });
+
+    const timer = setTimeout(release, 4000);
     return () => {
       active = false;
+      clearTimeout(timer);
       sub?.subscription?.unsubscribe();
     };
   }, []);

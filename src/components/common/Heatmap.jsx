@@ -20,7 +20,7 @@ const LEVELS_NUMERIC = [
   'hsl(210, 75%, 56%)',
 ];
 
-export default function Heatmap({ trackerId, tracker, logs, n = 84 }) {
+export default function Heatmap({ tracker, logs, n = 84 }) {
   const keys = lastNDaysKeys(n);
   // For numeric, compute max for scaling.
   let max = 0;

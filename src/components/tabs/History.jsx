@@ -11,7 +11,7 @@ import DayDetail from './DayDetail.jsx';
  *   { type: 'month', year, monthIdx }  -> show calendar
  *   { type: 'day', key }                -> show day detail for that date
  */
-export default function History({ route, setRoute, bumpStale }) {
+export default function History({ route, setRoute }) {
   const arg = route.arg;
 
   const monthState = useMemo(() => {
@@ -46,10 +46,7 @@ export default function History({ route, setRoute, bumpStale }) {
         onPrev={() => setRoute({ tab: 'history', arg: { type: 'month', ...clampMonth(monthState.year, monthState.monthIdx - 1) } })}
         onNext={() => setRoute({ tab: 'history', arg: { type: 'month', ...clampMonth(monthState.year, monthState.monthIdx + 1) } })}
         onSelect={(dateKey) => {
-          const [y, m] = dateKey.split('-').map(Number);
           setRoute({ tab: 'history', dateKey, arg: { type: 'day', key: dateKey } });
-          // Note: routing for the day's "month" is implicit via the key.
-          void y; void m;
         }}
       />
     </div>

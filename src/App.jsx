@@ -15,7 +15,8 @@ import RestoreSession from './components/shell/RestoreSession.jsx';
 import FocusWidget from './components/shell/FocusWidget.jsx';
 import Login from './components/shell/Login.jsx';
 import { AuthProvider, useAuth } from './contexts/Auth.jsx';
-import { FocusTimerProvider, useFocusStatus } from './contexts/FocusTimer.jsx';
+import { FocusTimerProvider } from './contexts/FocusTimer.jsx';
+import { useFocusStatus } from './hooks/useFocusTimer.js';
 import { useRoute } from './hooks/useRoute.js';
 import { useStaleTabs, useStaleVersion } from './hooks/useStaleTabs.js';
 import { useBootGate } from './hooks/useBootGate.js';
@@ -114,11 +115,11 @@ function AppInner() {
   } else if (route.tab === 'planner') {
     pane = <Planner route={route} setRoute={setRoute} bumpStale={bumpStale} />;
   } else if (route.tab === 'tracker') {
-    pane = <Tracker route={route} setRoute={setRoute} bumpStale={bumpStale} />;
+    pane = <Tracker bumpStale={bumpStale} />;
   } else if (route.tab === 'clock') {
     pane = <Clock />;
   } else if (route.tab === 'history') {
-    pane = <History route={route} setRoute={setRoute} bumpStale={bumpStale} />;
+    pane = <History route={route} setRoute={setRoute} />;
   } else {
     pane = null;
   }

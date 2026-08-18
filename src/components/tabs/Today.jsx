@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import DataStore from '../../store/DataStore.js';
 import { todayKey } from '../../lib/date.js';
 import { computeStreak } from '../../lib/streaks.js';
-import { useFocusStatus, useFocusTimer } from '../../contexts/FocusTimer.jsx';
+import { useFocusStatus, useFocusTimer } from '../../hooks/useFocusTimer.js';
 
 /**
  * Today tab — interactive composite (PRD §6.2).

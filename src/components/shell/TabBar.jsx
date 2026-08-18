@@ -5,7 +5,7 @@ import { TABS } from '../../hooks/useRoute.js';
  * Color-coded dot per tab, used both in stale treatment and in the History
  * calendar (PRD HI-004). Journal=blue, Planner=amber, Tracker=green.
  */
-export const TAB_DOT = {
+const TAB_DOT = {
   journal: 'var(--dot-journal)',
   planner: 'var(--dot-planner)',
   tracker: 'var(--dot-tracker)',

@@ -182,16 +182,6 @@ const tracker = {
     }));
   },
 
-  async _persistRow(row) {
-    const userId = await uid();
-    await unwrap(
-      sb.from('trackers').upsert(
-        { ...row, user_id: userId },
-        { onConflict: 'user_id,id' }
-      )
-    );
-  },
-
   async create({ name, type, unit = null }) {
     const userId = await uid();
     const id = uuid();

@@ -9,7 +9,7 @@ import TrackerModal from './TrackerModal.jsx';
  * V2.4: list load via useAsyncResult. CRUD writes async — bump version after
  * each await resolves to trigger a clean re-read.
  */
-export default function Tracker({ route, setRoute, bumpStale }) {
+export default function Tracker({ bumpStale }) {
   const [version, setVersion] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);

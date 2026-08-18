@@ -31,7 +31,7 @@ create table if not exists public.planner_days (
   primary key (user_id, date)
 );
 
--- trackers: catalog oftracker definitions (boolean / number + unit).
+-- trackers: catalog of tracker definitions (boolean / number + unit).
 create table if not exists public.trackers (
   user_id    uuid not null references auth.users(id) on delete cascade,
   id         uuid not null default gen_random_uuid(),

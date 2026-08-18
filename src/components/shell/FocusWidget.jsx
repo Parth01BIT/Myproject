@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useFocusTimer, hasFocusMinutesTracker } from '../../contexts/FocusTimer.jsx';
+import { useState } from 'react';
+import { useFocusTimer, hasFocusMinutesTracker } from '../../hooks/useFocusTimer.js';
 import { useAsyncResult } from '../../hooks/useAsyncResult.js';
 
 /**
@@ -16,10 +16,6 @@ import { useAsyncResult } from '../../hooks/useAsyncResult.js';
 export default function FocusWidget() {
   const focus = useFocusTimer();
   const [hovered, setHovered] = useState(false);
-  const [showTrackerTip, setShowTrackerTip] = useState(false);
-  void setShowTrackerTip;
-
-  const [showTipOnce, setShowTipOnce] = useState(false);
 
   // V2.4: async check — re-run whenever a focus session completes (version bump).
   const { data: hasTracker } = useAsyncResult(
@@ -28,12 +24,6 @@ export default function FocusWidget() {
     [focus.version]
   );
   const trackerMissing = hasTracker === false;
-
-  useEffect(() => {
-    if (focus.status === 'idle' && !showTipOnce && trackerMissing) {
-      // Tip is rendered as a persistent subtle hint on hover (below).
-    }
-  }, [focus.status, showTipOnce, trackerMissing]);
 
   if (focus.status === 'idle') return null;
 

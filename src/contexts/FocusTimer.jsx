@@ -29,7 +29,7 @@ import { todayKey } from '../lib/date.js';
  *     {completed:false, stopReason}, feed trackers by actual elapsed minutes,
  *     do NOT trigger auto-break. elapsed < 60s → discard silently (mis-click).
  */
-const FocusTimerCtx = createContext(null);
+export const FocusTimerCtx = createContext(null);
 
 export const FOCUS_DEFAULT_SEC  = 25 * 60;
 export const BREAK_DEFAULT_SEC  = 5 * 60;
@@ -348,49 +348,4 @@ async function feedFocusTracker(minutes) {
   } catch (e) {
     console.warn('[PARTH] feedFocusTracker failed:', e?.message);
   }
-}
-
-/** Detect whether such a tracker already exists (for the soft tip in widget).
- *  V2.4: now async. FocusWidget handles the promise. */
-export async function hasFocusMinutesTracker() {
-  try {
-    const trackers = await DataStore.tracker.list();
-    return trackers.some((t) => {
-      if (t.type !== 'number') return false;
-      const name = (t.name || '').trim().toLowerCase();
-      const candidates = ['focus minutes', 'focus min', 'focus-minutes', 'focus_time', 'focusminutes', 'focus', 'focus time'];
-      if (candidates.includes(name)) return true;
-      const unit = (t.unit || '').trim().toLowerCase();
-      if (name === 'focus' && (unit === 'min' || unit === 'minutes')) return true;
-      return false;
-    });
-  } catch (e) {
-    console.warn('[PARTH] hasFocusMinutesTracker failed:', e?.message);
-    return false;
-  }
-}
-
-export function useFocusTimer() {
-  const ctx = useContext(FocusTimerCtx);
-  if (!ctx) throw new Error('useFocusTimer must be used within <FocusTimerProvider>');
-  return ctx;
-}
-
-/**
- * Lightweight hook for components that just want to know "is a focus session
- * running right now?" — used by the TabBar pulse indicator and Today's
- * "live" chip.
- */
-export function useFocusStatus() {
-  const ctx = useContext(FocusTimerCtx);
-  if (!ctx) return { running: false, playingTabId: null };
-  return {
-    running: ctx.status === 'running' || ctx.status === 'paused',
-    paused: ctx.status === 'paused',
-    mode: ctx.mode,
-    /** Tab id where the pulse indicator should show (only when bound to a task). */
-    playingTabId: ctx.status !== 'idle' && ctx.taskId ? 'planner' : null,
-    taskId: ctx.taskId,
-    version: ctx.version,
-  };
 }
