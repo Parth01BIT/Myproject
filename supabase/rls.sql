@@ -2,6 +2,19 @@
 -- Run AFTER schema.sql. Idempotent.
 -- Each table enforces: a user can only touch rows where user_id = auth.uid().
 
+-- ---------------------------------------------------------------------------
+-- Role grants — Supabase auto-applies these when tables are created via the
+-- dashboard UI, but NOT when created via raw SQL. Always run explicitly.
+-- ---------------------------------------------------------------------------
+grant usage on schema public to authenticated, anon;
+
+grant all on public.journal         to authenticated;
+grant all on public.planner_days    to authenticated;
+grant all on public.trackers        to authenticated;
+grant all on public.tracker_logs    to authenticated;
+grant all on public.focus_sessions  to authenticated;
+grant all on public.meta            to authenticated;
+
 -- Safety: ensure RLS is on for all 6 tables.
 alter table public.journal         enable row level security;
 alter table public.planner_days    enable row level security;

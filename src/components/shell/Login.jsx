@@ -79,8 +79,8 @@ export default function Login() {
               className="login__input login__input--code"
               type="text"
               inputMode="numeric"
-              pattern="[0-9]{6,7}"
-              maxLength={7}
+              pattern="[0-9]{6,8}"
+              maxLength={8}
               placeholder="000000"
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
