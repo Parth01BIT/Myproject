@@ -23,7 +23,7 @@ export default function Login() {
 
   function onSubmitCode(e) {
     e.preventDefault();
-    if (code.trim().length !== 6) return;
+    if (code.trim().length < 6) return;
     verifyOtp(email, code).catch(() => {});
   }
 
@@ -79,8 +79,8 @@ export default function Login() {
               className="login__input login__input--code"
               type="text"
               inputMode="numeric"
-              pattern="[0-9]{6}"
-              maxLength={6}
+              pattern="[0-9]{6,7}"
+              maxLength={7}
               placeholder="000000"
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
@@ -90,7 +90,7 @@ export default function Login() {
             <button
               className="login__submit"
               type="submit"
-              disabled={busy || code.trim().length !== 6}
+              disabled={busy || code.trim().length < 6}
             >
               {busy ? 'Verifying…' : 'Verify & sign in →'}
             </button>
