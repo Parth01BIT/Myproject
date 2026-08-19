@@ -16,7 +16,8 @@ const HEATMAP_RANGE = 84;
 export default function TrackerCard({ tracker, onChange, onEdit, onDelete }) {
   const [bump, setBump] = useState(false);
   const [numDraft, setNumDraft] = useState(null);
-  const dayK = todayKey();
+  // ⚠️ Do NOT hoist todayKey() here — it would be stale after midnight.
+  // Call it fresh inside effects and handlers instead.
 
   const [todaysLog, setTodaysLog] = useState(null);
   const [streak, setStreak] = useState(null);
@@ -25,10 +26,12 @@ export default function TrackerCard({ tracker, onChange, onEdit, onDelete }) {
   useEffect(() => {
     let active = true;
     (async () => {
-      const endKey = dayK;
+      // Compute todayKey() fresh inside the effect so it's always the
+      // current calendar day, even if the component mounted yesterday.
+      const endKey = todayKey();
       const startKey = addDays(endKey, -(HEATMAP_RANGE - 1));
       const [log, logMap] = await Promise.all([
-        DataStore.tracker.getLog(tracker.id, dayK),
+        DataStore.tracker.getLog(tracker.id, endKey),
         DataStore.tracker.getLogsForRange(tracker.id, startKey, endKey),
       ]);
       if (!active) return;
@@ -47,10 +50,11 @@ export default function TrackerCard({ tracker, onChange, onEdit, onDelete }) {
   }, [tracker.id, tracker.type, onChange]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function toggle() {
+    const currentDay = todayKey(); // always use the real current date
     const nextVal = !todaysLog?.value;
     const work = nextVal
-      ? DataStore.tracker.log(tracker.id, dayK, true)
-      : DataStore.tracker.removeLog(tracker.id, dayK);
+      ? DataStore.tracker.log(tracker.id, currentDay, true)
+      : DataStore.tracker.removeLog(tracker.id, currentDay);
     setBump(true);
     setTimeout(() => setBump(false), 160);
     work
@@ -64,7 +68,8 @@ export default function TrackerCard({ tracker, onChange, onEdit, onDelete }) {
     const n = Number(raw);
     if (raw.trim() === '' || Number.isNaN(n)) return;
     setNumDraft(null);
-    DataStore.tracker.log(tracker.id, dayK, n)
+    const currentDay = todayKey(); // always use the real current date
+    DataStore.tracker.log(tracker.id, currentDay, n)
       .then(() => onChange())
       .catch((err) => console.warn('[PARTH] tracker log failed:', err?.message));
   }

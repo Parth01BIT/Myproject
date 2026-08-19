@@ -21,6 +21,8 @@ import { useRoute } from './hooks/useRoute.js';
 import { useStaleTabs, useStaleVersion } from './hooks/useStaleTabs.js';
 import { useBootGate } from './hooks/useBootGate.js';
 import { useTheme } from './hooks/useTheme.js';
+import { useDebounced } from './hooks/useDebounced.js';
+import ErrorBoundary from './components/shell/ErrorBoundary.jsx';
 import { todayKey, dayDiff } from './lib/date.js';
 import DataStore from './store/DataStore.js';
 import Journal from './components/tabs/Journal.jsx';
@@ -53,6 +55,9 @@ function AuthGate() {
 function AppInner() {
   const [route, setRoute] = useRoute();
   const [staleVersion, bumpStale] = useStaleVersion();
+  // Debounce stale re-computation so rapid writes (journal typing) don't fire
+  // 3+N Supabase queries on every keystroke. 2 s of inactivity is enough.
+  const debouncedBumpStale = useDebounced(bumpStale, 2000);
   const { stale } = useStaleTabs(todayKey(), staleVersion);
   const { theme, toggle: toggleTheme } = useTheme();
   const focusStatus = useFocusStatus();
@@ -109,13 +114,13 @@ function AppInner() {
 
   let pane;
   if (route.tab === 'today') {
-    pane = <Today route={route} setRoute={setRoute} bumpStale={bumpStale} />;
+    pane = <Today route={route} setRoute={setRoute} bumpStale={debouncedBumpStale} />;
   } else if (route.tab === 'journal') {
-    pane = <Journal route={route} setRoute={setRoute} bumpStale={bumpStale} />;
+    pane = <Journal route={route} setRoute={setRoute} bumpStale={debouncedBumpStale} />;
   } else if (route.tab === 'planner') {
-    pane = <Planner route={route} setRoute={setRoute} bumpStale={bumpStale} />;
+    pane = <Planner route={route} setRoute={setRoute} bumpStale={debouncedBumpStale} />;
   } else if (route.tab === 'tracker') {
-    pane = <Tracker bumpStale={bumpStale} />;
+    pane = <Tracker bumpStale={debouncedBumpStale} />;
   } else if (route.tab === 'clock') {
     pane = <Clock />;
   } else if (route.tab === 'history') {
@@ -123,6 +128,10 @@ function AppInner() {
   } else {
     pane = null;
   }
+  // Wrap in ErrorBoundary keyed by tab so switching tabs auto-resets any error.
+  const safePane = pane
+    ? <ErrorBoundary key={route.tab}>{pane}</ErrorBoundary>
+    : null;
 
   return (
     <>
@@ -143,7 +152,7 @@ function AppInner() {
         onToggleTheme={toggleTheme}
         playingTabId={focusStatus.playingTabId}
       >
-        {pane}
+        {safePane}
       </BrowserShell>
       <FocusWidget />
     </>

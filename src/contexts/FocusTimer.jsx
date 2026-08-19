@@ -50,6 +50,11 @@ export function FocusTimerProvider({ children }) {
   // session linkage
   const [taskId, setTaskId] = useState(null);
   const [taskTitle, setTaskTitle] = useState(null);
+  // Refs mirror state so beforeunload handler always reads the current value.
+  const taskIdRef   = useRef(null);
+  const taskTitleRef = useRef(null);
+  useEffect(() => { taskIdRef.current   = taskId;    }, [taskId]);
+  useEffect(() => { taskTitleRef.current = taskTitle; }, [taskTitle]);
 
   // timing refs (drift-proof)
   const deadlineRef       = useRef(0);
@@ -69,7 +74,68 @@ export function FocusTimerProvider({ children }) {
   useEffect(() => { statusRef.current = status; }, [status]);
   useEffect(() => { modeRef.current = mode; }, [mode]);
 
+  // ---------- Flush any session saved by a previous beforeunload ----------
+  // If the user refreshed mid-session, the beforeunload handler (below) will
+  // have serialised the in-flight session to sessionStorage. Flush it to
+  // Supabase on this mount before anything else.
+  useEffect(() => {
+    const raw = sessionStorage.getItem('parth:pending-focus-session');
+    if (!raw) return;
+    sessionStorage.removeItem('parth:pending-focus-session');
+    try {
+      const { session, dateKey } = JSON.parse(raw);
+      DataStore.focus.add(dateKey, session).catch((e) =>
+        console.warn('[PARTH] flush pending session failed:', e?.message)
+      );
+    } catch {
+      // Corrupt entry — ignore silently.
+    }
+  }, []); // mount only
+
+  // ---------- Save in-flight session on page refresh / unload ----------
+  // beforeunload fires synchronously. Supabase fetch won't complete in time,
+  // so we write to sessionStorage instead (survives refresh, cleared on close).
+  // The flush effect above picks this up on the next mount.
+  useEffect(() => {
+    const handleUnload = () => {
+      if (statusRef.current === 'idle') return;
+
+      const plannedSec = focusSecRef.current;
+      const remainingSec = remainingRef.current / 1000;
+      const elapsedSec = Math.max(0, Math.round(plannedSec - remainingSec));
+
+      if (elapsedSec < MIN_KEEP_SECONDS) return; // too short — discard
+
+      const session = {
+        id: uuid(),
+        taskId:    taskIdRef.current,
+        taskTitle: taskTitleRef.current,
+        startedAt: startedAtRef.current,
+        endedAt:   new Date().toISOString(),
+        durationSec: plannedSec,
+        elapsedSec,
+        mode:      modeRef.current,
+        completed: false,
+        stopReason: 'page_unload',
+      };
+
+      try {
+        const dateKey = new Date().toISOString().slice(0, 10);
+        sessionStorage.setItem(
+          'parth:pending-focus-session',
+          JSON.stringify({ session, dateKey })
+        );
+      } catch {
+        // sessionStorage full or disabled — silently drop.
+      }
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, []); // refs keep this stable — no deps needed
+
   // ---------- Helpers (single-flight) ----------
+
 
   const writeSession = useCallback((partial) => {
     const plannedSec = focusSecRef.current;

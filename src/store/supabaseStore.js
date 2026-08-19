@@ -407,9 +407,7 @@ const meta = {
   },
 
   async update(patch) {
-    for (const [k, v] of Object.entries(patch)) {
-      await meta._upsert(k, v);
-    }
+    await Promise.all(Object.entries(patch).map(([k, v]) => meta._upsert(k, v)));
     return meta.get();
   },
 
