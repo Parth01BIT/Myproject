@@ -17,6 +17,11 @@ export default function Today({ route, setRoute, bumpStale }) {
   const [version, setVersion] = useState(0);
   const bump = () => { setVersion((v) => v + 1); bumpStale?.(); };
 
+  // Controlled drafts for number-tracker inputs keyed by tracker id.
+  // Reset to the saved log value every time async data reloads so the
+  // input always reflects Supabase state, not a stale uncontrolled snapshot.
+  const [numDrafts, setNumDrafts] = useState({});
+
   const focus = useFocusTimer();
   const focusStatus = useFocusStatus();
 
@@ -52,6 +57,15 @@ export default function Today({ route, setRoute, bumpStale }) {
           streaks: streakEntries.filter((s) => s.streak.current > 0),
           focusStats,
         });
+        // Sync controlled inputs to the freshly-loaded log values so
+        // inputs never show a stale value after an async reload.
+        const freshDrafts = {};
+        for (const { tracker, log } of logEntries) {
+          if (tracker.type === 'number') {
+            freshDrafts[tracker.id] = log != null ? String(log.value) : '';
+          }
+        }
+        setNumDrafts(freshDrafts);
       } catch (e) {
         console.warn('[PARTH] Today load failed:', e?.message);
         if (active) setData({
@@ -107,6 +121,8 @@ export default function Today({ route, setRoute, bumpStale }) {
       .then(() => bump())
       .catch((err) => console.warn('[PARTH] submitNumeric failed:', err?.message));
   };
+
+  const setDraft = (id, val) => setNumDrafts((prev) => ({ ...prev, [id]: val }));
 
   const doneCount = tasks.filter((t) => t.done).length;
 
@@ -195,12 +211,19 @@ export default function Today({ route, setRoute, bumpStale }) {
                   <input
                     type="number"
                     className="numinput numinput--sm"
-                    placeholder={log != null ? String(log.value) : '0'}
-                    defaultValue={log != null ? String(log.value) : ''}
-                    onKeyDown={(e) => { if (e.key === 'Enter') submitNumeric(tracker.id, e.target.value); }}
-                    onBlur={(e) => {
-                      const raw = e.target.value;
-                      if (raw === '' || raw === (log != null ? String(log.value) : '')) return;
+                    placeholder="0"
+                    value={numDrafts[tracker.id] ?? (log != null ? String(log.value) : '')}
+                    onChange={(e) => setDraft(tracker.id, e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        submitNumeric(tracker.id, numDrafts[tracker.id] ?? '');
+                        e.target.blur();
+                      }
+                    }}
+                    onBlur={() => {
+                      const raw = numDrafts[tracker.id] ?? '';
+                      const saved = log != null ? String(log.value) : '';
+                      if (raw === '' || raw === saved) return;
                       submitNumeric(tracker.id, raw);
                     }}
                     step="any"

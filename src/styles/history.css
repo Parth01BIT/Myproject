@@ -3,6 +3,8 @@
   max-width: 980px;
   margin: 0 auto;
   padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+  /* Allow the tab to scroll if content is taller than the content area. */
+  overflow-y: auto;
 }
 
 .cal {
@@ -53,10 +55,19 @@
 .cal__grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  /* Cap the grid so 6 rows always fit within the viewport.
+     Subtract titlebar (~36px) + tabbar (~40px) + addressbar (~40px) +
+     cal header (~48px) + weekdays row (~28px) + legend (~36px) +
+     padding (~64px) = ~292px chrome → grid gets the remaining space. */
+  max-height: calc(100vh - 320px);
   gap: 2px;
+  overflow: hidden;
 }
 .cal__day {
-  aspect-ratio: 1 / 1;
+  /* Use min-height instead of aspect-ratio so cells shrink to fit
+     the max-height-capped grid rather than forcing the grid taller. */
+  min-height: 0;
+  aspect-ratio: unset;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -83,21 +94,16 @@
 
 /* Mobile/touch calendar adjustments. */
 @media (max-width: 768px) {
-  /* Tighten calendar padding on phones — history panel already has reduced
-     horizontal padding from the shell-level rule. */
   .cal { padding: var(--space-sm); }
   .cal__head { margin-bottom: var(--space-sm); }
   .cal__monthlabel { font-size: var(--text-base); }
   .cal__nav { width: var(--tap-min); height: var(--tap-min); }
-  /* Weekday abbreviations are 3 letters but they crowd on a 320px screen. */
   .cal__weekday { font-size: 9px; letter-spacing: 0.04em; padding: 2px 0; }
-  /* Day cells: reduce inner padding so the day number + dots have more
-     visual room per cell. Cells already use `aspect-ratio: 1/1` so they
-     scale automatically with available width. */
   .cal__day { font-size: 12px; padding: 2px; }
+  /* On mobile the viewport is shorter — tighten the grid max-height. */
+  .cal__grid { max-height: calc(100vh - 280px); }
   .cal__dots { gap: 2px; }
   .dot { width: 5px; height: 5px; }
-  /* Legend — let it wrap and tighten gaps. */
   .cal__legend { gap: var(--space-sm); }
 }
 
