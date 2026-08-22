@@ -11,9 +11,11 @@
   gap: var(--space-lg);
   padding: var(--space-lg);
   overflow-y: auto;
+  overflow-x: hidden;
   height: 100%;
   min-height: 0;
   box-sizing: border-box;
+  width: 100%;
 }
 
 @media (max-width: 480px) {
@@ -77,13 +79,18 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-xs);
-  padding: var(--space-xl) var(--space-lg);
+  padding: var(--space-lg);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   text-align: center;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
+}
+@media (max-width: 480px) {
+  .cat__countdown { padding: var(--space-md) var(--space-sm); }
+  .cat__countdown-number { font-size: clamp(2.5rem, 18vw, 4rem); }
 }
 .cat__countdown::before {
   content: '';
@@ -304,9 +311,14 @@
 .cat__topics { display: flex; flex-direction: column; gap: var(--space-sm); }
 .cat__topics-add  { display: flex; gap: var(--space-sm); }
 .cat__topics-input {
-  flex: 1; background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md);
-  color: var(--text-primary); font-size: var(--text-sm);
+  flex: 1;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
   transition: border-color var(--dur-fast) var(--ease);
 }
 .cat__topics-input:focus { border-color: var(--border-strong); outline: none; }
@@ -360,9 +372,14 @@
 .cat__plan { display: flex; flex-direction: column; gap: var(--space-sm); }
 .cat__plan-add { display: flex; gap: var(--space-sm); }
 .cat__plan-input {
-  flex: 1; background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md);
-  color: var(--text-primary); font-size: var(--text-sm);
+  flex: 1;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
   transition: border-color var(--dur-fast) var(--ease);
 }
 .cat__plan-input:focus { border-color: var(--border-strong); outline: none; }

@@ -2,7 +2,7 @@
 
 > **Purpose:** Hand this file to the AI at the start of every session so it can
 > skip the directory-surfing phase and jump straight into work.
-> Last updated: August 2026 — **v4**
+> Last updated: August 2026 — **v5**
 
 ---
 
@@ -44,6 +44,7 @@ parth/
 ├── vite.config.js
 ├── package.json
 ├── vercel.json
+├── public/                  <- PWA files (manifest.json, sw.js, icons)
 ├── PARTH_PRD_v1.md          <- full product spec
 ├── PROJECT_CONTEXT.md       <- this file
 ├── supabase/
@@ -94,7 +95,8 @@ parth/
     │   │   ├── History.jsx        <- calendar month view <-> day detail router
     │   │   ├── MonthGrid.jsx      <- calendar grid with colour-coded dot indicators
     │   │   ├── DayDetail.jsx      <- read-only composite view of a past day
-    │   │   └── Clock.jsx          <- analogue/digital clock tab (bonus tab)
+    │   │   ├── Clock.jsx          <- analogue/digital clock tab (bonus tab)
+    │   │   └── Cat.jsx            <- CAT 2026 exam prep tab (dashboard + subject sub-pages)
     │   └── common/          <- Shared sub-components
     │       ├── DayNav.jsx         <- <- / -> day navigation arrows
     │       ├── Heatmap.jsx        <- 12-week GitHub-style heatmap grid
@@ -110,7 +112,8 @@ parth/
         ├── clock.css
         ├── focus.css        <- FocusWidget + timer styles
         ├── login.css
-        └── polish.css       <- boot sequence, restore session, micro-animations
+        ├── polish.css       <- boot sequence, restore session, micro-animations
+        └── cat.css          <- CAT tab styles
 ```
 
 ---
@@ -133,7 +136,7 @@ App
 ```
 
 **Tab panes** rendered by `AppInner` based on `route.tab`:
-`today` | `journal` | `planner` | `tracker` | `clock` | `history`
+`today` | `journal` | `planner` | `tracker` | `cat` | `clock` | `history`
 
 ---
 
@@ -148,6 +151,7 @@ App
   { id: 'journal', label: 'Journal', icon: '📓' },
   { id: 'planner', label: 'Planner', icon: '🗓' },
   { id: 'tracker', label: 'Tracker', icon: '📊' },
+  { id: 'cat',     label: 'CAT',     icon: '🎯' },
   { id: 'clock',   label: 'Clock',   icon: '⏱' },
   { id: 'history', label: 'History', icon: '🕰' },
 ]
@@ -158,6 +162,7 @@ App
 - `parth://journal/aug-18`
 - `parth://planner/aug-18`
 - `parth://tracker`
+- `parth://cat/nov-29`
 - `parth://clock`
 - `parth://history/aug-2026`
 - `parth://history/aug-14`
@@ -209,6 +214,24 @@ DataStore.meta.update(patch)             -> metaObject
 DataStore.meta.touchVisit()              -> metaObject
 DataStore.meta.getTheme()               -> string
 DataStore.meta.setTheme(theme)           -> void
+
+// CAT 2026 (v5)
+DataStore.cat.getProgress(date)          -> { qa, dilr, varc }
+DataStore.cat.setProgress(date, section, value) -> void
+DataStore.cat.getTasks(date, section)    -> Task[]
+DataStore.cat.addTask(date, title, section) -> Task
+DataStore.cat.toggleTask(id, done)       -> void
+DataStore.cat.deleteTask(id)             -> void
+DataStore.cat.topics.list(section)       -> Topic[]
+DataStore.cat.topics.add(section, title) -> Topic
+DataStore.cat.topics.toggle(id, done)    -> void
+DataStore.cat.topics.updateTitle(id, title) -> void
+DataStore.cat.topics.delete(id)          -> void
+DataStore.cat.mocks.list()               -> Mock[]
+DataStore.cat.mocks.add({date, type, name, score}) -> Mock
+DataStore.cat.mocks.delete(id)           -> void
+DataStore.cat.notes.get(section)         -> string
+DataStore.cat.notes.save(section, text)  -> void
 ```
 
 **Task shape:**
@@ -225,7 +248,7 @@ DataStore.meta.setTheme(theme)           -> void
 
 ## 7. Supabase Database Schema
 
-7 tables, all with `user_id uuid references auth.users`:
+11 tables, all with `user_id uuid references auth.users`:
 
 | Table | Primary Key | Notes |
 |---|---|---|
@@ -234,7 +257,11 @@ DataStore.meta.setTheme(theme)           -> void
 | `trackers` | `(user_id, id)` | `name, type, unit, created_at` |
 | `tracker_logs` | `(user_id, tracker_id, date)` | `value jsonb` — bool or number |
 | `focus_sessions` | `(user_id, id)` | `date, task_id, started_at, ended_at, duration_sec, elapsed_sec, mode, completed, stop_reason` |
-| `meta` | `(user_id, key)` | key/value: `lastVisit`, `firstUse`, `theme`, `migrated` |
+| `meta` | `(user_id, key)` | key/value: `lastVisit`, `firstUse`, `theme`, `migrated`, `cat_notes_*` |
+| `cat_progress` | `(user_id, date, section)` | `value integer` (0-100) |
+| `cat_tasks` | `(user_id, id)` | `date, title, done, order_idx, section` |
+| `cat_topic_items` | `(user_id, id)` | `section, title, done, order_idx` |
+| `cat_mocks` | `(user_id, id)` | `date, type, name, score` |
 
 RLS policies in `supabase/rls.sql` — users can only read/write their own rows.
 
@@ -308,17 +335,18 @@ All data goes through `DataStore`. `localStorage.js` is only imported by
 | **v2** | FocusTimer (Pomodoro) — floating widget, tracker auto-feed, focus_sessions table |
 | **v3** | Clock tab (bonus tab, not in PRD) |
 | **v4** | Supabase migration — all DataStore methods async, email OTP auth, RLS, migrateLocalToSupabase |
+| **v5** | CAT 2026 tab (countdown, checklists, daily plans, mock logs) + PWA setup (manifest/sw) |
 
 > The codebase uses internal labels like "V2.4" / "Stage A / Stage B" in comments.
 > These refer to sub-steps within v4's Supabase migration work, not product versions.
 
 ---
 
-## 12. Current State (v4 — Live)
+## 12. Current State (v5 — Live)
 
-- All 5 PRD tabs + bonus Clock tab functional
-- **v4:** Supabase backend replacing localStorage
-- **v4:** Email OTP auth + one-shot migration script (localStorage → Supabase)
+- All 5 PRD tabs + bonus Clock tab + CAT tab functional
+- **v5:** CAT 2026 tab + PWA config
+- **v4:** Supabase backend replacing localStorage, email OTP auth
 - **v3:** Clock tab
 - **v2:** FocusTimer (Pomodoro) with tracker auto-feed
 - Dual theme (dark default / warm-paper light)
@@ -337,6 +365,7 @@ All data goes through `DataStore`. `localStorage.js` is only imported by
 | Journal | One entry/day, RichEditor (contentEditable), mood picker (5 moods), tags, 500ms auto-save |
 | Planner | Task list, quick-add (Enter), inline edit, priority badge, drag-reorder, day picker |
 | Tracker | Boolean (toggle) + number trackers, streak forgiveness, 12-week heatmap |
+| CAT | Countdown, QA/DILR/VARC sub-pages with progress, topics, daily plan, notes. Mock log. |
 | History | Month calendar grid, color-coded dots (journal=blue, planner=amber, tracker=green), day detail |
 | Clock | Analogue + digital clock, bonus tab not in original PRD |
 
