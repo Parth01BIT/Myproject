@@ -7,11 +7,12 @@ import { todayKey, dayShortLabel, monthLabelKey, toKey, dayDiff } from '../lib/d
  * Address bar renders `parth://{route}/{arg}` for display.
  */
 export const TABS = [
-  { id: 'today', label: 'Today', icon: '🏠' },
+  { id: 'today',   label: 'Today',   icon: '🏠' },
   { id: 'journal', label: 'Journal', icon: '📓' },
   { id: 'planner', label: 'Planner', icon: '🗓' },
   { id: 'tracker', label: 'Tracker', icon: '📊' },
-  { id: 'clock', label: 'Clock', icon: '⏱' },
+  { id: 'cat',     label: 'CAT',     icon: '🎯' },
+  { id: 'clock',   label: 'Clock',   icon: '⏱' },
   { id: 'history', label: 'History', icon: '🕰' },
 ];
 
@@ -39,6 +40,7 @@ export function parsePath(pathname) {
 
   if (tab === 'tracker') return { tab, dateKey: todayKey(), arg: null };
   if (tab === 'clock')    return { tab, dateKey: todayKey(), arg: null };
+  if (tab === 'cat')      return { tab, dateKey: todayKey(), arg: null };
 
   // Try to resolve arg as either "aug-16" (day) or "aug-2026" (month) or day-in-history "aug-14".
   if (arg) {
@@ -75,6 +77,7 @@ export function parsePath(pathname) {
 export function buildPath(tab, dateKey, argOverride) {
   if (tab === 'tracker') return '/tracker';
   if (tab === 'clock')    return '/clock';
+  if (tab === 'cat')      return '/cat';
   if (tab === 'history') {
     if (argOverride && argOverride.type === 'day') return `/history/${dayShortLabel(argOverride.key)}`;
     if (argOverride && argOverride.type === 'month') return `/history/${monthLabelKey(argOverride.year, argOverride.monthIdx)}`;
@@ -89,6 +92,7 @@ export function buildPath(tab, dateKey, argOverride) {
 export function buildAddress(tab, dateKey, arg) {
   if (tab === 'tracker') return 'parth://tracker';
   if (tab === 'clock')    return 'parth://clock';
+  if (tab === 'cat')      return 'parth://cat/nov-29';
   if (tab === 'history') {
     if (arg && arg.type === 'day') return `parth://history/${dayShortLabel(arg.key)}`;
     if (arg && arg.type === 'month') return `parth://history/${monthLabelKey(arg.year, arg.monthIdx)}`;

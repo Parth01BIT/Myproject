@@ -9,6 +9,7 @@ import './styles/clock.css';
 import './styles/focus.css';
 import './styles/login.css';
 import './styles/polish.css';
+import './styles/cat.css';
 import BrowserShell from './components/shell/BrowserShell.jsx';
 import BootSequence from './components/shell/BootSequence.jsx';
 import RestoreSession from './components/shell/RestoreSession.jsx';
@@ -31,6 +32,7 @@ import Tracker from './components/tabs/Tracker.jsx';
 import History from './components/tabs/History.jsx';
 import Today from './components/tabs/Today.jsx';
 import Clock from './components/tabs/Clock.jsx';
+import Cat from './components/tabs/Cat.jsx';
 
 function App() {
   return (
@@ -121,6 +123,8 @@ function AppInner() {
     pane = <Planner route={route} setRoute={setRoute} bumpStale={debouncedBumpStale} />;
   } else if (route.tab === 'tracker') {
     pane = <Tracker bumpStale={debouncedBumpStale} />;
+  } else if (route.tab === 'cat') {
+    pane = <Cat />;
   } else if (route.tab === 'clock') {
     pane = <Clock />;
   } else if (route.tab === 'history') {

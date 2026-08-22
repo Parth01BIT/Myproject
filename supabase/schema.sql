@@ -1,10 +1,11 @@
--- PARTH — Supabase schema (V2.4)
+-- PARTH — Supabase schema (V2.5)
 -- Run in the Supabase SQL Editor. Idempotent: safe to re-run after edits.
 -- Companion file: rls.sql (enables row-level security + policies).
 
 -- ============================================================================
--- 7 tables, all scoped by user_id (references auth.users). One row per
+-- 9 tables, all scoped by user_id (references auth.users). One row per
 -- (user_id, natural-key). Maps 1:1 to the parth:* localStorage namespaces.
+-- V2.5 adds: cat_progress, cat_tasks (CAT 2026 exam prep tab)
 -- ============================================================================
 
 -- journal: one entry per (user, day). matches DataStore.journal shape.
@@ -94,11 +95,39 @@ begin
 end;
 $$;
 
+-- cat_progress: one row per (user, date, section). Tracks study progress
+-- per section per day so you can chart improvement over time.
+create table if not exists public.cat_progress (
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  date       date not null,
+  section    text not null check (section in ('qa', 'dilr', 'varc')),
+  value      integer not null default 0 check (value between 0 and 100),
+  updated_at timestamptz not null default now(),
+  primary key (user_id, date, section)
+);
+
+-- cat_tasks: CAT-prep daily task list, separate from planner_days.
+create table if not exists public.cat_tasks (
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  id         uuid not null default gen_random_uuid(),
+  date       date not null,
+  title      text not null,
+  done       boolean not null default false,
+  order_idx  integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (user_id, id)
+);
+
+-- index to quickly fetch all tasks for a given (user, date)
+create index if not exists cat_tasks_user_date
+  on public.cat_tasks (user_id, date);
+
 do $$
 declare
   t text;
 begin
-  for t in select unnest(array['journal', 'planner_days', 'meta'])
+  for t in select unnest(array['journal', 'planner_days', 'meta', 'cat_progress', 'cat_tasks'])
   loop
     execute format(
       'drop trigger if exists set_updated_at on public.%I;

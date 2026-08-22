@@ -1,4 +1,4 @@
--- PARTH — Row-Level Security policies (V2.4)
+-- PARTH — Row-Level Security policies (V2.5)
 -- Run AFTER schema.sql. Idempotent.
 -- Each table enforces: a user can only touch rows where user_id = auth.uid().
 
@@ -14,6 +14,8 @@ grant all on public.trackers        to authenticated;
 grant all on public.tracker_logs    to authenticated;
 grant all on public.focus_sessions  to authenticated;
 grant all on public.meta            to authenticated;
+grant all on public.cat_progress    to authenticated;
+grant all on public.cat_tasks       to authenticated;
 
 -- Safety: ensure RLS is on for all 6 tables.
 alter table public.journal         enable row level security;
@@ -22,6 +24,8 @@ alter table public.trackers        enable row level security;
 alter table public.tracker_logs    enable row level security;
 alter table public.focus_sessions  enable row level security;
 alter table public.meta            enable row level security;
+alter table public.cat_progress    enable row level security;
+alter table public.cat_tasks       enable row level security;
 
 -- ---------------------------------------------------------------------------
 -- Generic policy pattern, repeated per table:
@@ -99,5 +103,25 @@ create policy meta_delete on public.meta for delete using (user_id = auth.uid())
 --   Auth → Providers → Email → "Confirm email" = ON
 --   Auth → Email Templates → "Confirm signup" template uses {{ .Token }}
 --   (a 6-digit numeric token) rather than {{ .ConfirmationURL }}
--- That keeps the magic-link style off and signals OTP-only sign-in.
+--   That keeps the magic-link style off and signals OTP-only sign-in.
 -- ---------------------------------------------------------------------------
+
+-- cat_progress
+drop policy if exists cat_progress_select on public.cat_progress;
+drop policy if exists cat_progress_insert on public.cat_progress;
+drop policy if exists cat_progress_update on public.cat_progress;
+drop policy if exists cat_progress_delete on public.cat_progress;
+create policy cat_progress_select on public.cat_progress for select using (user_id = auth.uid());
+create policy cat_progress_insert on public.cat_progress for insert with check (user_id = auth.uid());
+create policy cat_progress_update on public.cat_progress for update using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy cat_progress_delete on public.cat_progress for delete using (user_id = auth.uid());
+
+-- cat_tasks
+drop policy if exists cat_tasks_select on public.cat_tasks;
+drop policy if exists cat_tasks_insert on public.cat_tasks;
+drop policy if exists cat_tasks_update on public.cat_tasks;
+drop policy if exists cat_tasks_delete on public.cat_tasks;
+create policy cat_tasks_select on public.cat_tasks for select using (user_id = auth.uid());
+create policy cat_tasks_insert on public.cat_tasks for insert with check (user_id = auth.uid());
+create policy cat_tasks_update on public.cat_tasks for update using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy cat_tasks_delete on public.cat_tasks for delete using (user_id = auth.uid());

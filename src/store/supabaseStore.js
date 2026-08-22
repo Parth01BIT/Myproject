@@ -1,5 +1,5 @@
 /**
- * Supabase implementation of the DataStore interface (V2.4).
+ * Supabase implementation of the DataStore interface (V2.5).
  * Drop-in async replacement for localStorage.js.
  *
  * Every method returns a Promise. Call sites migrate to `useAsyncResult`
@@ -427,6 +427,123 @@ const meta = {
   },
 };
 
+/* ============================================================ CAT 2026 === */
+
+/**
+ * cat.progress — per (date, section) progress values stored in cat_progress.
+ * cat.tasks    — daily CAT-prep task list stored in cat_tasks.
+ *
+ * Both tables are fully scoped by user_id + RLS; no cross-user data possible.
+ */
+const cat = {
+  /* ---- progress ---- */
+
+  /** Get progress for all 3 sections on a given date. Returns { qa, dilr, varc } (0-100). */
+  async getProgress(date) {
+    const userId = await uid();
+    const rows = await unwrap(
+      sb.from('cat_progress')
+        .select('section, value')
+        .eq('user_id', userId)
+        .eq('date', date)
+    );
+    const out = { qa: 0, dilr: 0, varc: 0 };
+    for (const r of rows || []) out[r.section] = r.value;
+    return out;
+  },
+
+  /** Get progress for a section across a date range. Returns Map<date, value>. */
+  async getProgressRange(section, startDate, endDate) {
+    const userId = await uid();
+    const rows = await unwrap(
+      sb.from('cat_progress')
+        .select('date, value')
+        .eq('user_id', userId)
+        .eq('section', section)
+        .gte('date', startDate)
+        .lte('date', endDate)
+        .order('date', { ascending: true })
+    );
+    const out = new Map();
+    for (const r of rows || []) out.set(r.date, r.value);
+    return out;
+  },
+
+  /** Upsert a single section value for a given date. */
+  async setProgress(date, section, value) {
+    const userId = await uid();
+    await unwrap(
+      sb.from('cat_progress').upsert(
+        { user_id: userId, date, section, value },
+        { onConflict: 'user_id,date,section' }
+      )
+    );
+  },
+
+  /* ---- tasks ---- */
+
+  /** Get all CAT tasks for a given date, ordered by order_idx. */
+  async getTasks(date) {
+    const userId = await uid();
+    const rows = await unwrap(
+      sb.from('cat_tasks')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('date', date)
+        .order('order_idx', { ascending: true })
+    );
+    return (rows || []).map((r) => ({
+      id: r.id,
+      title: r.title,
+      done: r.done,
+      order: r.order_idx,
+    }));
+  },
+
+  /** Add a new CAT task for a given date. */
+  async addTask(date, title) {
+    const userId = await uid();
+    const existing = await cat.getTasks(date);
+    const orderIdx = existing.length
+      ? Math.max(...existing.map((t) => t.order)) + 1
+      : 0;
+    const id = uuid();
+    await unwrap(
+      sb.from('cat_tasks').insert({
+        user_id: userId,
+        id,
+        date,
+        title,
+        done: false,
+        order_idx: orderIdx,
+      })
+    );
+    return { id, title, done: false, order: orderIdx };
+  },
+
+  /** Toggle the done state of a task. */
+  async toggleTask(id, done) {
+    const userId = await uid();
+    await unwrap(
+      sb.from('cat_tasks')
+        .update({ done })
+        .eq('user_id', userId)
+        .eq('id', id)
+    );
+  },
+
+  /** Delete a CAT task by id. */
+  async deleteTask(id) {
+    const userId = await uid();
+    await unwrap(
+      sb.from('cat_tasks')
+        .delete()
+        .eq('user_id', userId)
+        .eq('id', id)
+    );
+  },
+};
+
 /* ============================================================ Export === */
 
 export const DataStore = {
@@ -435,6 +552,7 @@ export const DataStore = {
   tracker,
   focus,
   meta,
+  cat,
 };
 
 export default DataStore;
