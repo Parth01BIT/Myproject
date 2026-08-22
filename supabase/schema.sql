@@ -114,20 +114,53 @@ create table if not exists public.cat_tasks (
   title      text not null,
   done       boolean not null default false,
   order_idx  integer not null default 0,
+  -- section: null = dashboard-level task; 'qa'|'dilr'|'varc' = subject-scoped task
+  section    text check (section in ('qa', 'dilr', 'varc')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   primary key (user_id, id)
 );
+-- For existing rows: backfill section = NULL (already the default for new column)
+alter table public.cat_tasks add column if not exists section text check (section in ('qa', 'dilr', 'varc'));
 
 -- index to quickly fetch all tasks for a given (user, date)
 create index if not exists cat_tasks_user_date
   on public.cat_tasks (user_id, date);
 
+-- cat_topic_items: editable topic checklist per section (e.g. "Algebra", "RC Passage types").
+create table if not exists public.cat_topic_items (
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  id         uuid not null default gen_random_uuid(),
+  section    text not null check (section in ('qa', 'dilr', 'varc')),
+  title      text not null,
+  done       boolean not null default false,
+  order_idx  integer not null default 0,
+  created_at timestamptz not null default now(),
+  primary key (user_id, id)
+);
+create index if not exists cat_topics_user_section
+  on public.cat_topic_items (user_id, section);
+
+-- cat_mocks: log of every mock attempt (full-length or sectional).
+create table if not exists public.cat_mocks (
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  id         uuid not null default gen_random_uuid(),
+  date       date not null,
+  -- type: 'full' = full-length; 'qa'|'dilr'|'varc' = sectional
+  type       text not null check (type in ('full', 'qa', 'dilr', 'varc')),
+  name       text,        -- e.g. "AIMCAT 3", "SimCAT 7"
+  score      integer,     -- raw score
+  created_at timestamptz not null default now(),
+  primary key (user_id, id)
+);
+create index if not exists cat_mocks_user_date
+  on public.cat_mocks (user_id, date desc);
+
 do $$
 declare
   t text;
 begin
-  for t in select unnest(array['journal', 'planner_days', 'meta', 'cat_progress', 'cat_tasks'])
+  for t in select unnest(array['journal', 'planner_days', 'meta', 'cat_progress', 'cat_tasks', 'cat_topic_items'])
   loop
     execute format(
       'drop trigger if exists set_updated_at on public.%I;

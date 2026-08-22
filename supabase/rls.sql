@@ -16,6 +16,8 @@ grant all on public.focus_sessions  to authenticated;
 grant all on public.meta            to authenticated;
 grant all on public.cat_progress    to authenticated;
 grant all on public.cat_tasks       to authenticated;
+grant all on public.cat_topic_items to authenticated;
+grant all on public.cat_mocks       to authenticated;
 
 -- Safety: ensure RLS is on for all 6 tables.
 alter table public.journal         enable row level security;
@@ -26,6 +28,8 @@ alter table public.focus_sessions  enable row level security;
 alter table public.meta            enable row level security;
 alter table public.cat_progress    enable row level security;
 alter table public.cat_tasks       enable row level security;
+alter table public.cat_topic_items enable row level security;
+alter table public.cat_mocks       enable row level security;
 
 -- ---------------------------------------------------------------------------
 -- Generic policy pattern, repeated per table:
@@ -125,3 +129,21 @@ create policy cat_tasks_select on public.cat_tasks for select using (user_id = a
 create policy cat_tasks_insert on public.cat_tasks for insert with check (user_id = auth.uid());
 create policy cat_tasks_update on public.cat_tasks for update using (user_id = auth.uid()) with check (user_id = auth.uid());
 create policy cat_tasks_delete on public.cat_tasks for delete using (user_id = auth.uid());
+
+-- cat_topic_items
+drop policy if exists cat_topics_select on public.cat_topic_items;
+drop policy if exists cat_topics_insert on public.cat_topic_items;
+drop policy if exists cat_topics_update on public.cat_topic_items;
+drop policy if exists cat_topics_delete on public.cat_topic_items;
+create policy cat_topics_select on public.cat_topic_items for select using (user_id = auth.uid());
+create policy cat_topics_insert on public.cat_topic_items for insert with check (user_id = auth.uid());
+create policy cat_topics_update on public.cat_topic_items for update using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy cat_topics_delete on public.cat_topic_items for delete using (user_id = auth.uid());
+
+-- cat_mocks
+drop policy if exists cat_mocks_select on public.cat_mocks;
+drop policy if exists cat_mocks_insert on public.cat_mocks;
+drop policy if exists cat_mocks_delete on public.cat_mocks;
+create policy cat_mocks_select on public.cat_mocks for select using (user_id = auth.uid());
+create policy cat_mocks_insert on public.cat_mocks for insert with check (user_id = auth.uid());
+create policy cat_mocks_delete on public.cat_mocks for delete using (user_id = auth.uid());

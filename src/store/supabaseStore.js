@@ -438,7 +438,7 @@ const meta = {
 const cat = {
   /* ---- progress ---- */
 
-  /** Get progress for all 3 sections on a given date. Returns { qa, dilr, varc } (0-100). */
+  /** Returns { qa, dilr, varc } (0-100) for the given date. */
   async getProgress(date) {
     const userId = await uid();
     const rows = await unwrap(
@@ -452,24 +452,7 @@ const cat = {
     return out;
   },
 
-  /** Get progress for a section across a date range. Returns Map<date, value>. */
-  async getProgressRange(section, startDate, endDate) {
-    const userId = await uid();
-    const rows = await unwrap(
-      sb.from('cat_progress')
-        .select('date, value')
-        .eq('user_id', userId)
-        .eq('section', section)
-        .gte('date', startDate)
-        .lte('date', endDate)
-        .order('date', { ascending: true })
-    );
-    const out = new Map();
-    for (const r of rows || []) out.set(r.date, r.value);
-    return out;
-  },
-
-  /** Upsert a single section value for a given date. */
+  /** Upsert one section's value for a given date. */
   async setProgress(date, section, value) {
     const userId = await uid();
     await unwrap(
@@ -482,65 +465,174 @@ const cat = {
 
   /* ---- tasks ---- */
 
-  /** Get all CAT tasks for a given date, ordered by order_idx. */
-  async getTasks(date) {
+  /**
+   * Get CAT tasks for a date.
+   * section: null = dashboard-level tasks; 'qa'|'dilr'|'varc' = subject tasks.
+   */
+  async getTasks(date, section = null) {
     const userId = await uid();
-    const rows = await unwrap(
-      sb.from('cat_tasks')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('date', date)
-        .order('order_idx', { ascending: true })
-    );
+    let q = sb.from('cat_tasks')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('date', date)
+      .order('order_idx', { ascending: true });
+    if (section) {
+      q = q.eq('section', section);
+    } else {
+      q = q.is('section', null);
+    }
+    const rows = await unwrap(q);
     return (rows || []).map((r) => ({
-      id: r.id,
-      title: r.title,
-      done: r.done,
-      order: r.order_idx,
+      id: r.id, title: r.title, done: r.done, order: r.order_idx, section: r.section ?? null,
     }));
   },
 
-  /** Add a new CAT task for a given date. */
-  async addTask(date, title) {
+  /** Add a new CAT task. section = null for dashboard, 'qa'|'dilr'|'varc' for subject. */
+  async addTask(date, title, section = null) {
     const userId = await uid();
-    const existing = await cat.getTasks(date);
+    const existing = await cat.getTasks(date, section);
     const orderIdx = existing.length
       ? Math.max(...existing.map((t) => t.order)) + 1
       : 0;
     const id = uuid();
-    await unwrap(
-      sb.from('cat_tasks').insert({
-        user_id: userId,
-        id,
-        date,
-        title,
-        done: false,
-        order_idx: orderIdx,
-      })
-    );
-    return { id, title, done: false, order: orderIdx };
+    const payload = { user_id: userId, id, date, title, done: false, order_idx: orderIdx };
+    if (section) payload.section = section;
+    await unwrap(sb.from('cat_tasks').insert(payload));
+    return { id, title, done: false, order: orderIdx, section };
   },
 
-  /** Toggle the done state of a task. */
+  /** Toggle done state of a task. */
   async toggleTask(id, done) {
     const userId = await uid();
     await unwrap(
-      sb.from('cat_tasks')
-        .update({ done })
-        .eq('user_id', userId)
-        .eq('id', id)
+      sb.from('cat_tasks').update({ done }).eq('user_id', userId).eq('id', id)
     );
   },
 
-  /** Delete a CAT task by id. */
+  /** Delete a task. */
   async deleteTask(id) {
     const userId = await uid();
     await unwrap(
-      sb.from('cat_tasks')
-        .delete()
-        .eq('user_id', userId)
-        .eq('id', id)
+      sb.from('cat_tasks').delete().eq('user_id', userId).eq('id', id)
     );
+  },
+
+  /* ---- topics ---- */
+
+  topics: {
+    async list(section) {
+      const userId = await uid();
+      const rows = await unwrap(
+        sb.from('cat_topic_items')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('section', section)
+          .order('order_idx', { ascending: true })
+      );
+      return (rows || []).map((r) => ({
+        id: r.id, title: r.title, done: r.done, order: r.order_idx,
+      }));
+    },
+
+    async add(section, title) {
+      const userId = await uid();
+      const existing = await cat.topics.list(section);
+      const orderIdx = existing.length
+        ? Math.max(...existing.map((t) => t.order)) + 1
+        : 0;
+      const id = uuid();
+      await unwrap(
+        sb.from('cat_topic_items').insert({
+          user_id: userId, id, section, title, done: false, order_idx: orderIdx,
+        })
+      );
+      return { id, title, done: false, order: orderIdx };
+    },
+
+    async toggle(id, done) {
+      const userId = await uid();
+      await unwrap(
+        sb.from('cat_topic_items').update({ done }).eq('user_id', userId).eq('id', id)
+      );
+    },
+
+    async updateTitle(id, title) {
+      const userId = await uid();
+      await unwrap(
+        sb.from('cat_topic_items').update({ title }).eq('user_id', userId).eq('id', id)
+      );
+    },
+
+    async delete(id) {
+      const userId = await uid();
+      await unwrap(
+        sb.from('cat_topic_items').delete().eq('user_id', userId).eq('id', id)
+      );
+    },
+  },
+
+  /* ---- mocks ---- */
+
+  mocks: {
+    async list() {
+      const userId = await uid();
+      const rows = await unwrap(
+        sb.from('cat_mocks')
+          .select('*')
+          .eq('user_id', userId)
+          .order('date', { ascending: false })
+          .order('created_at', { ascending: false })
+      );
+      return (rows || []).map((r) => ({
+        id: r.id, date: r.date, type: r.type,
+        name: r.name || null, score: r.score ?? null,
+      }));
+    },
+
+    async add({ date, type, name = null, score = null }) {
+      const userId = await uid();
+      const id = uuid();
+      await unwrap(
+        sb.from('cat_mocks').insert({
+          user_id: userId, id, date, type,
+          name: name || null, score: score ?? null,
+        })
+      );
+      return { id, date, type, name, score };
+    },
+
+    async delete(id) {
+      const userId = await uid();
+      await unwrap(
+        sb.from('cat_mocks').delete().eq('user_id', userId).eq('id', id)
+      );
+    },
+  },
+
+  /* ---- notes (per-section, stored in meta table) ---- */
+
+  notes: {
+    async get(section) {
+      const userId = await uid();
+      const row = await unwrap(
+        sb.from('meta')
+          .select('value')
+          .eq('user_id', userId)
+          .eq('key', `cat_notes_${section}`)
+          .maybeSingle()
+      );
+      return typeof row?.value === 'string' ? row.value : (row?.value ?? '');
+    },
+
+    async save(section, text) {
+      const userId = await uid();
+      await unwrap(
+        sb.from('meta').upsert(
+          { user_id: userId, key: `cat_notes_${section}`, value: text, updated_at: new Date().toISOString() },
+          { onConflict: 'user_id,key' }
+        )
+      );
+    },
   },
 };
 
